@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Anchor Study | Stay Focused. Stay Grounded.</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="nav-container">
+
+            <a href="/" class="brand">
+                <img
+                    src="{{ url_for('static', filename='images/anchor-study-logo.png') }}"
+                    alt="Anchor Study logo"
+                    class="brand-logo"
+                >
+            </a>
+
+            <nav class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#spiritual">Faith</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="/login">Sign In</a>
+                <a href="/signup" class="nav-button">Get Started</a>
+            </nav>
+
+        </div>
+    </header>
+
+    <main>
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-container">
+
+                <div class="hero-content">
+                    <p class="eyebrow">YOUR STUDENT COMPANION</p>
+
+                    <h1>
+                        Stay focused.<br>
+                        <span>Stay grounded.</span>
+                    </h1>
+
+                    <p class="hero-text">
+                        A student space designed to help you organise your
+                        studies, manage your goals and grow in your faith.
+                    </p>
+
+                    <div class="hero-buttons">
+                        <a href="/signup" class="primary-button">
+                            Get Started
+                        </a>
+
+                        <a href="#preview" class="secondary-button">
+                            Explore Anchor Study
+                        </a>
+                    </div>
+                </div>
+
+                <div class="hero-visual">
+                    <img
+                        src="{{ url_for('static', filename='images/Anchie.png') }}"
+                        alt="Anchie, the Anchor Study mascot"
+                        class="anchie-image"
+                    >
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="features section" id="features">
+
+            <div class="section-heading">
+                <p class="eyebrow">MADE FOR STUDENT LIFE</p>
+
+                <h2>More than a study planner.</h2>
+
+                <p>
+                    Anchor Study brings your academic life, personal goals
+                    and faith together in one organised space.
+                </p>
+            </div>
+
+            <div class="feature-grid">
+
+                <article class="feature-card">
+                    <div class="feature-icon">📚</div>
+
+                    <h3>Study</h3>
+
+                    <p>
+                        Organise your subjects, study sessions and academic progress.
+                    </p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">✓</div>
+
+                    <h3>Tasks</h3>
+
+                    <p>
+                        Keep track of assignments, deadlines and everyday tasks.
+                    </p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">📝</div>
+
+                    <h3>Notes</h3>
+
+                    <p>
+                        Keep your important study notes, ideas and thoughts organised.
+                    </p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">🎯</div>
+
+                    <h3>Goals</h3>
+
+                    <p>
+                        Set meaningful goals and keep track of the progress you make.
+                    </p>
+                </article>
+
+            </div>
+
+        </section>
+
+        <!-- Spiritual Life -->
+        <section class="spiritual section" id="spiritual">
+
+            <div class="spiritual-container">
+
+                <div class="spiritual-content">
+
+                    <p class="eyebrow">STAY GROUNDED</p>
+
+                    <h2>
+                        Your spiritual life belongs in your student journey too.
+                    </h2>
+
+                    <p class="spiritual-intro">
+                        University is about more than getting through your courses.
+                        Anchor Study gives you space to grow academically,
+                        spiritually and personally.
+                    </p>
+
+                    <div class="spiritual-features">
+
+                        <div class="spiritual-feature">
+                            <span class="spiritual-icon">📖</span>
+
+                            <div>
+                                <h3>Scripture</h3>
+
+                                <p>
+                                    Keep meaningful Scripture close as you navigate
+                                    student life.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="spiritual-feature">
+                            <span class="spiritual-icon">🙏</span>
+
+                            <div>
+                                <h3>Prayer Journal</h3>
+
+                                <p>
+                                    Record prayer requests, reflections and answered prayers.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="spiritual-feature">
+                            <span class="spiritual-icon">🌿</span>
+
+                            <div>
+                                <h3>Devotionals</h3>
+
+                                <p>
+                                    Make intentional space for personal time with God.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="spiritual-feature">
+                            <span class="spiritual-icon">💭</span>
+
+                            <div>
+                                <h3>Reflections</h3>
+
+                                <p>
+                                    Pause, reflect and recognise how you are growing.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="scripture-card">
+
+                    <div class="scripture-mark">“</div>
+
+                    <p class="scripture-text">
+                        Rooted and built up in him, and stablished in the faith,
+                        as ye have been taught, abounding therein with thanksgiving.
+                    </p>
+
+                    <p class="scripture-reference">
+                        Colossians 2:7
+                    </p>
+
+                    <div class="scripture-anchor">
+                        ⚓
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- App Preview -->
+        <section class="preview section" id="preview">
+
+            <div class="section-heading">
+                <p class="eyebrow">A PEEK INSIDE</p>
+
+                <h2>Your student life, organised.</h2>
+
+                <p>
+                    Anchor Study brings your most important student tools
+                    together without unnecessary clutter.
+                </p>
+            </div>
+
+            <div class="dashboard-preview">
+
+                <aside class="preview-sidebar">
+
+                    <div class="preview-brand">
+                        Anchor Study
+                    </div>
+
+                    <div class="preview-nav active">Dashboard</div>
+                    <div class="preview-nav">Study</div>
+                    <div class="preview-nav">Tasks</div>
+                    <div class="preview-nav">Notes</div>
+                    <div class="preview-nav">Faith</div>
+                    <div class="preview-nav">Goals</div>
+
+                </aside>
+
+                <div class="preview-content">
+
+                    <div class="preview-top">
+
+                        <div>
+                            <p class="preview-small">WELCOME BACK</p>
+
+                            <h3>Your day, at a glance.</h3>
+                        </div>
+
+                        <div class="preview-date">
+                            Today
+                        </div>
+
+                    </div>
+
+                    <div class="preview-cards">
+
+                        <div class="preview-card">
+                            <span>Today's Tasks</span>
+                            <strong>4</strong>
+                        </div>
+
+                        <div class="preview-card">
+                            <span>Study Sessions</span>
+                            <strong>2</strong>
+                        </div>
+
+                        <div class="preview-card">
+                            <span>Goals</span>
+                            <strong>3</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="preview-lower">
+
+                        <div class="preview-panel">
+                            <h4>Today's focus</h4>
+
+                            <p>
+                                Algorithms and Data Structures
+                            </p>
+
+                            <div class="progress-line">
+                                <span></span>
+                            </div>
+                        </div>
+
+                        <div class="preview-panel">
+                            <h4>Stay grounded</h4>
+
+                            <p>
+                                Take a moment to reflect, pray and reset.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- How It Works -->
+        <section class="how-it-works section" id="how-it-works">
+
+            <div class="section-heading">
+
+                <p class="eyebrow">HOW IT WORKS</p>
+
+                <h2>Simple by design.</h2>
+
+                <p>
+                    Set up your space, make a plan and keep moving forward.
+                </p>
+
+            </div>
+
+            <div class="steps">
+
+                <div class="step">
+                    <span>01</span>
+
+                    <h3>Set up</h3>
+
+                    <p>
+                        Create your profile and set up your student space.
+                    </p>
+                </div>
+
+                <div class="step">
+                    <span>02</span>
+
+                    <h3>Plan</h3>
+
+                    <p>
+                        Organise your studies, tasks and goals.
+                    </p>
+                </div>
+
+                <div class="step">
+                    <span>03</span>
+
+                    <h3>Stay grounded</h3>
+
+                    <p>
+                        Reflect, grow and keep your priorities in sight.
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Final CTA -->
+        <section class="final-cta">
+
+            <div class="final-cta-content">
+
+                <p class="eyebrow">READY TO GET STARTED?</p>
+
+                <h2>
+                    Build your student journey with Anchor Study.
+                </h2>
+
+                <p>
+                    Study. Grow. Stay grounded.
+                </p>
+
+                <a href="/signup" class="primary-button">
+                    Get Started
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+
+        <div class="footer-container">
+
+            <div>
+
+                <a href="/" class="brand footer-brand">
+                    <img
+                        src="{{ url_for('static', filename='images/anchor-study-logo.png') }}"
+                        alt="Anchor Study logo"
+                        class="footer-logo"
+                    >
+                </a>
+
+                <p>
+                    Stay focused. Stay grounded.
+                </p>
+
+            </div>
+
+            <div class="footer-links">
+                <a href="#features">Features</a>
+                <a href="#spiritual">Faith</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="/login">Sign In</a>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+
+            <p>
+                © 2026 Anchor Study. All rights reserved.
+            </p>
+
+        </div>
+
+    </footer>
+
+</body>
+</html>
