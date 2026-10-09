@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ user.theme or 'anchor_classic' }}" data-doodles="{{ user.doodle_style or 'off' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Scriptures | Anchor Study</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--page-bg, #f7f8fc);
+            color: var(--text-primary, #17243d);
+            font-family: Arial, sans-serif;
+        }
+
+        .app-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 245px;
+            height: 100vh;
+            padding: 28px 18px;
+            background: var(--sidebar-bg, #ffffff);
+            border-right: 1px solid var(--border-color, #e8eaf0);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 0 8px;
+            margin-bottom: 34px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 43px;
+            height: 43px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 13px;
+            background: #102447;
+            color: #e6bd65;
+            font-size: 25px;
+        }
+
+        .brand-name {
+            color: var(--text-primary, #17243d);
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .brand-tagline {
+            margin-top: 4px;
+            color: var(--text-muted, #7b8496);
+            font-size: 11px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 26px;
+        }
+
+        .sidebar-label {
+            padding: 0 12px;
+            margin-bottom: 10px;
+            color: var(--text-muted, #8b93a3);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.3px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 12px;
+            margin-bottom: 4px;
+            border-radius: 10px;
+            color: var(--text-secondary, #596579);
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .sidebar-link:hover {
+            background: var(--hover-bg, #f1f3f8);
+            color: var(--text-primary, #17243d);
+        }
+
+        .sidebar-link.active {
+            background: #f5e8c9;
+            color: #102447;
+            font-weight: 700;
+        }
+
+        .sidebar-icon {
+            width: 19px;
+            text-align: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding-top: 18px;
+            border-top: 1px solid var(--border-color, #e8eaf0);
+        }
+
+        .scripture-main {
+            min-height: 100vh;
+            margin-left: 245px;
+            padding: 38px 40px 45px;
+        }
+
+        .scripture-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .scripture-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-greeting {
+            margin: 0 0 9px;
+            color: #b4862e;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+        }
+
+        .scripture-topbar h1 {
+            margin: 0;
+            color: var(--text-primary, #17243d);
+            font-size: 31px;
+        }
+
+        .dashboard-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color, #e8eaf0);
+            border-radius: 12px;
+            background: var(--card-bg, #ffffff);
+            color: var(--text-primary, #17243d);
+            text-decoration: none;
+            min-width: 0;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 13px;
+            background: #102447;
+            color: #e6bd65;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .dashboard-user strong,
+        .dashboard-user span {
+            display: block;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .dashboard-user strong {
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+
+        .dashboard-user span {
+            color: var(--text-muted, #7b8496);
+            font-size: 11px;
+        }
+
+        .scripture-intro {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+            padding: 30px;
+            margin-bottom: 28px;
+            border: 1px solid #e9dfc8;
+            border-radius: 18px;
+            background: linear-gradient(120deg, #fffaf0, #ffffff);
+        }
+
+        .eyebrow {
+            margin: 0 0 10px;
+            color: #b4862e;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.7px;
+        }
+
+        .scripture-intro h2 {
+            margin: 0 0 12px;
+            color: #102447;
+            font-size: 25px;
+        }
+
+        .scripture-intro p:last-child {
+            max-width: 560px;
+            margin: 0;
+            color: #697386;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .dashboard-anchor {
+            width: 75px;
+            height: 75px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 22px;
+            background: #102447;
+            color: #e6bd65;
+            font-size: 35px;
+        }
+
+        .scripture-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+            align-items: start;
+            gap: 24px;
+        }
+
+        .dashboard-panel {
+            min-width: 0;
+            padding: 25px;
+            border: 1px solid var(--border-color, #e8eaf0);
+            border-radius: 16px;
+            background: var(--card-bg, #ffffff);
+            box-shadow: 0 5px 20px rgba(16, 36, 71, 0.035);
+        }
+
+        .panel-heading {
+            margin-bottom: 25px;
+        }
+
+        .panel-heading h2 {
+            margin: 0;
+            color: var(--text-primary, #17243d);
+            font-size: 20px;
+        }
+
+        .task-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .task-form label {
+            display: block;
+            margin-bottom: 9px;
+            color: var(--text-primary, #17243d);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .task-form input,
+        .task-form textarea {
+            display: block;
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid var(--border-color, #dfe3eb);
+            border-radius: 10px;
+            outline: none;
+            background: var(--input-bg, #ffffff);
+            color: var(--text-primary, #17243d);
+            font: inherit;
+            font-size: 13px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .task-form input:focus,
+        .task-form textarea:focus {
+            border-color: #c9a04d;
+            box-shadow: 0 0 0 3px rgba(201, 160, 77, 0.13);
+        }
+
+        .task-form textarea {
+            min-height: 110px;
+            resize: vertical;
+            line-height: 1.7;
+        }
+
+        .task-form textarea[name="verse_text"] {
+            min-height: 155px;
+        }
+
+        .task-form .primary-button {
+            width: 100%;
+            min-height: 45px;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 10px;
+            background: #102447;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .task-form .primary-button:hover {
+            background: #1b365f;
+            transform: translateY(-1px);
+        }
+
+        .scripture-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .scripture-card {
+            padding: 19px;
+            border: 1px solid var(--border-color, #e8eaf0);
+            border-radius: 13px;
+            background: var(--card-bg, #ffffff);
+        }
+
+        .scripture-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .scripture-card-header > strong {
+            color: #a67b27;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .scripture-card-header > div {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
+        .inline-form {
+            display: inline-flex;
+            margin: 0;
+        }
+
+        .scripture-favorite,
+        .task-delete {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color, #e8eaf0);
+            border-radius: 9px;
+            background: var(--card-bg, #ffffff);
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .scripture-favorite {
+            color: #b4862e;
+            font-size: 20px;
+        }
+
+        .scripture-favorite:hover {
+            background: #fff7e5;
+        }
+
+        .task-delete {
+            color: #a34c4c;
+            font-size: 22px;
+        }
+
+        .task-delete:hover {
+            background: #fff0f0;
+        }
+
+        .scripture-card blockquote {
+            margin: 0;
+            padding-left: 15px;
+            border-left: 3px solid #e6bd65;
+            color: var(--text-primary, #344057);
+            font-size: 13px;
+            line-height: 1.9;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .scripture-reflection {
+            margin-top: 17px;
+            padding: 13px;
+            border-radius: 10px;
+            background: var(--hover-bg, #f7f8fc);
+        }
+
+        .scripture-reflection span {
+            display: block;
+            margin-bottom: 7px;
+            color: #a67b27;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .scripture-reflection p {
+            margin: 0;
+            color: var(--text-secondary, #596579);
+            font-size: 12px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .empty-state {
+            padding: 35px 15px;
+            text-align: center;
+        }
+
+        .card-icon {
+            width: 55px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            border-radius: 17px;
+            background: #fff4d9;
+            font-size: 25px;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 9px;
+            color: var(--text-primary, #17243d);
+            font-size: 15px;
+        }
+
+        .empty-state p {
+            margin: 0;
+            color: var(--text-muted, #7b8496);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .mobile-header,
+        .sidebar-overlay {
+            display: none;
+        }
+
+        @media (max-width: 1100px) {
+            .scripture-main {
+                padding-right: 25px;
+                padding-left: 25px;
+            }
+
+            .scripture-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .app-sidebar {
+                width: 270px;
+                max-width: 85vw;
+                transform: translateX(-100%);
+                transition: transform 0.25s ease;
+                box-shadow: none;
+            }
+
+            .app-sidebar.mobile-menu-visible {
+                transform: translateX(0);
+                box-shadow: 10px 0 35px rgba(0, 0, 0, 0.12);
+            }
+
+            .sidebar-overlay {
+                position: fixed;
+                inset: 0;
+                z-index: 999;
+                background: rgba(12, 25, 46, 0.45);
+            }
+
+            .sidebar-overlay.menu-open {
+                display: block;
+            }
+
+            .mobile-header {
+                position: sticky;
+                top: 0;
+                z-index: 900;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 12px 18px;
+                border-bottom: 1px solid var(--border-color, #e8eaf0);
+                background: var(--card-bg, #ffffff);
+            }
+
+            .mobile-brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: var(--text-primary, #17243d);
+                font-size: 15px;
+                font-weight: 700;
+                text-decoration: none;
+            }
+
+            .mobile-brand img {
+                width: 35px;
+                height: 35px;
+                object-fit: contain;
+            }
+
+            .menu-button {
+                width: 40px;
+                height: 40px;
+                border: 1px solid var(--border-color, #e8eaf0);
+                border-radius: 10px;
+                background: var(--card-bg, #ffffff);
+                color: var(--text-primary, #17243d);
+                font-size: 22px;
+                cursor: pointer;
+            }
+
+            .sidebar-close {
+                display: flex;
+                justify-content: flex-end;
+                margin-bottom: 18px;
+            }
+
+            .sidebar-close button {
+                width: 36px;
+                height: 36px;
+                border: none;
+                border-radius: 9px;
+                background: var(--hover-bg, #f1f3f8);
+                color: var(--text-primary, #17243d);
+                font-size: 21px;
+                cursor: pointer;
+            }
+
+            .scripture-main {
+                margin-left: 0;
+                padding: 26px 16px 35px;
+            }
+
+            .scripture-topbar {
+                align-items: flex-start;
+                margin-bottom: 24px;
+            }
+
+            .scripture-topbar h1 {
+                font-size: 27px;
+            }
+
+            .dashboard-user {
+                padding: 5px;
+                border: none;
+                background: transparent;
+            }
+
+            .dashboard-user > div:last-child {
+                display: none;
+            }
+
+            .scripture-intro {
+                padding: 23px 20px;
+                gap: 12px;
+            }
+
+            .scripture-intro h2 {
+                font-size: 21px;
+            }
+
+            .scripture-intro p:last-child {
+                font-size: 12px;
+            }
+
+            .dashboard-anchor {
+                width: 49px;
+                height: 49px;
+                border-radius: 15px;
+                font-size: 24px;
+            }
+
+            .dashboard-panel {
+                padding: 20px 16px;
+            }
+
+            .scripture-card {
+                padding: 15px;
+            }
+        }
+
+        @media (min-width: 701px) {
+            .sidebar-close {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="mobile-header">
+        <a href="{{ url_for('dashboard') }}" class="mobile-brand">
+            <img src="{{ url_for('static', filename='images/anchor-study-logo.png') }}" alt="Anchor Study logo">
+            <span>Anchor Study</span>
+        </a>
+
+        <button type="button" class="menu-button" id="sidebarOpen" aria-label="Open navigation menu" aria-controls="appSidebar" aria-expanded="false">
+            ☰
+        </button>
+    </header>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="app-sidebar" id="appSidebar">
+
+        <div class="sidebar-close">
+            <button type="button" id="sidebarClose" aria-label="Close navigation menu">×</button>
+        </div>
+
+        <a href="{{ url_for('dashboard') }}" class="sidebar-brand">
+            <div class="brand-icon">⚓</div>
+            <div>
+                <div class="brand-name">Anchor Study</div>
+                <div class="brand-tagline">Stay focused. Stay grounded.</div>
+            </div>
+        </a>
+
+        <nav>
+            <div class="sidebar-section">
+                <div class="sidebar-label">Workspace</div>
+
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+                    <span class="sidebar-icon">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="{{ url_for('study') }}" class="sidebar-link">
+                    <span class="sidebar-icon">▤</span>
+                    <span>Study Planner</span>
+                </a>
+
+                <a href="{{ url_for('timer') }}" class="sidebar-link">
+                    <span class="sidebar-icon">◷</span>
+                    <span>Focus Timer</span>
+                </a>
+
+                <a href="{{ url_for('tasks') }}" class="sidebar-link">
+                    <span class="sidebar-icon">☑</span>
+                    <span>Tasks</span>
+                </a>
+
+                <a href="{{ url_for('notes') }}" class="sidebar-link">
+                    <span class="sidebar-icon">▧</span>
+                    <span>Notes</span>
+                </a>
+
+                <a href="{{ url_for('goals') }}" class="sidebar-link">
+                    <span class="sidebar-icon">◎</span>
+                    <span>Goals</span>
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-label">Personal Space</div>
+
+                <a href="{{ url_for('scripture') }}" class="sidebar-link active" aria-current="page">
+                    <span class="sidebar-icon">✧</span>
+                    <span>My Scriptures</span>
+                </a>
+
+                <a href="{{ url_for('prayer_journal') }}" class="sidebar-link">
+                    <span class="sidebar-icon">♡</span>
+                    <span>Prayer Journal</span>
+                </a>
+
+                <a href="{{ url_for('devotionals') }}" class="sidebar-link">
+                    <span class="sidebar-icon">☼</span>
+                    <span>Devotionals</span>
+                </a>
+
+                <a href="{{ url_for('reflections') }}" class="sidebar-link">
+                    <span class="sidebar-icon">✎</span>
+                    <span>Reflections</span>
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-label">Account</div>
+
+                <a href="{{ url_for('profile') }}" class="sidebar-link">
+                    <span class="sidebar-icon">♙</span>
+                    <span>Profile</span>
+                </a>
+
+                <a href="{{ url_for('settings') }}" class="sidebar-link">
+                    <span class="sidebar-icon">⚙</span>
+                    <span>Settings</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}" class="sidebar-link">
+                <span class="sidebar-icon">⇥</span>
+                <span>Log Out</span>
+            </a>
+        </div>
+
+    </aside>
+
+    <main class="scripture-main">
+        <div class="scripture-container">
+
+            <header class="scripture-topbar">
+                <div>
+                    <p class="dashboard-greeting">STAY GROUNDED</p>
+                    <h1>My Scriptures.</h1>
+                </div>
+
+                <a href="{{ url_for('profile') }}" class="dashboard-user">
+                    <div class="user-avatar">
+                        {{ user.full_name[0].upper() if user.full_name else '?' }}
+                    </div>
+
+                    <div>
+                        <strong>{{ user.full_name }}</strong>
+                        <span>{{ user.course or 'Student' }}</span>
+                    </div>
+                </a>
+            </header>
+
+            <section class="scripture-intro">
+                <div>
+                    <p class="eyebrow">YOUR SCRIPTURE LIBRARY</p>
+                    <h2>Keep the Word close.</h2>
+                    <p>Save verses that encourage, challenge or speak to you during your journey.</p>
+                </div>
+
+                <div class="dashboard-anchor">📖</div>
+            </section>
+
+            <section class="scripture-grid">
+
+                <article class="dashboard-panel">
+                    <div class="panel-heading">
+                        <p class="eyebrow">SAVE SCRIPTURE</p>
+                        <h2>Add a verse.</h2>
+                    </div>
+
+                    <form method="POST" class="task-form">
+
+                        <div class="form-group">
+                            <label for="reference">Reference</label>
+                            <input
+                                type="text"
+                                id="reference"
+                                name="reference"
+                                placeholder="e.g. Proverbs 3:5-6"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="verse_text">Scripture</label>
+                            <textarea
+                                id="verse_text"
+                                name="verse_text"
+                                rows="7"
+                                placeholder="Write or paste the verse here..."
+                                required
+                            ></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reflection">Personal reflection</label>
+                            <textarea
+                                id="reflection"
+                                name="reflection"
+                                rows="5"
+                                placeholder="What does this Scripture mean to you?"
+                            ></textarea>
+                        </div>
+
+                        <button type="submit" class="primary-button">Save Scripture</button>
+                    </form>
+                </article>
+
+                <article class="dashboard-panel">
+                    <div class="panel-heading">
+                        <p class="eyebrow">SAVED SCRIPTURE</p>
+                        <h2>Your collection.</h2>
+                    </div>
+
+                    <div class="scripture-list">
+
+                        {% if scriptures %}
+
+                            {% for scripture in scriptures %}
+
+                                <div class="scripture-card">
+
+                                    <div class="scripture-card-header">
+                                        <strong>{{ scripture.reference }}</strong>
+
+                                        <div>
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for('favorite_scripture', scripture_id=scripture.id) }}"
+                                                class="inline-form"
+                                            >
+                                                <button
+                                                    type="submit"
+                                                    class="scripture-favorite"
+                                                    aria-label="{% if scripture.favorite %}Remove from favourites{% else %}Add to favourites{% endif %}"
+                                                    title="{% if scripture.favorite %}Remove from favourites{% else %}Add to favourites{% endif %}"
+                                                >
+                                                    {% if scripture.favorite %}
+                                                        ★
+                                                    {% else %}
+                                                        ☆
+                                                    {% endif %}
+                                                </button>
+                                            </form>
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for('delete_scripture', scripture_id=scripture.id) }}"
+                                                class="inline-form"
+                                                onsubmit="return confirm('Are you sure you want to delete this Scripture?');"
+                                            >
+                                                <button
+                                                    type="submit"
+                                                    class="task-delete"
+                                                    aria-label="Delete Scripture"
+                                                    title="Delete Scripture"
+                                                >
+                                                    ×
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <blockquote>{{ scripture.verse_text }}</blockquote>
+
+                                    {% if scripture.reflection %}
+                                        <div class="scripture-reflection">
+                                            <span>Personal Reflection</span>
+                                            <p>{{ scripture.reflection }}</p>
+                                        </div>
+                                    {% endif %}
+
+                                </div>
+
+                            {% endfor %}
+
+                        {% else %}
+
+                            <div class="empty-state">
+                                <div class="card-icon">📖</div>
+                                <h3>Your Scripture library is empty.</h3>
+                                <p>Save a verse that you want to keep close.</p>
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+                </article>
+
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        const sidebar = document.getElementById('appSidebar');
+        const sidebarOpen = document.getElementById('sidebarOpen');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function openSidebar() {
+            sidebar.classList.add('mobile-menu-visible');
+            sidebarOverlay.classList.add('menu-open');
+            sidebarOpen.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('mobile-menu-visible');
+            sidebarOverlay.classList.remove('menu-open');
+            sidebarOpen.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+
+        sidebarOpen.addEventListener('click', openSidebar);
+        sidebarClose.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', closeSidebar);
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                closeSidebar();
+            }
+        });
+    </script>
+
+</body>
+</html>
+

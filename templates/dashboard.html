@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ user.theme or 'anchor_classic' }}" data-doodles="{{ user.doodle_style or 'off' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | Anchor Study</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        /* Dashboard sidebar branding */
+        .sidebar .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 8px 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .sidebar .brand-mark {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: var(--gold);
+            color: var(--navy);
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .sidebar .brand-name {
+            color: var(--white);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .sidebar .brand-caption {
+            color: #c2ccda;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .sidebar .nav-label {
+            margin: 28px 10px 12px;
+            color: #aebbd0;
+            font-size: 10px;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+        }
+
+        .sidebar .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 0;
+            padding: 12px 13px;
+            margin-bottom: 5px;
+            color: #dbe2ec;
+            border-radius: 9px;
+            font-size: 13px;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .sidebar .sidebar-link span:first-child {
+            width: 20px;
+            min-width: 20px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        .sidebar .sidebar-link:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--white);
+        }
+
+        .sidebar .sidebar-link.active {
+            background: var(--gold);
+            color: var(--navy);
+            font-weight: 700;
+        }
+
+        .sidebar .sidebar-section {
+            margin-top: 0;
+        }
+
+        .sidebar .sidebar-section p {
+            margin: 28px 10px 12px;
+            color: #aebbd0;
+            font-size: 10px;
+            font-weight: 400;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            padding: 0;
+        }
+
+        .sidebar .sidebar-bottom {
+            margin-top: auto;
+            padding-top: 18px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                transition: transform 0.25s ease;
+            }
+        }
+
+        @media (min-width: 651px) and (max-width: 1100px) {
+            .sidebar .brand {
+                gap: 8px;
+                padding: 0 8px 25px;
+            }
+
+            .sidebar .brand-mark {
+                width: 38px;
+                height: 38px;
+                font-size: 22px;
+            }
+
+            .sidebar .brand-name {
+                font-size: 16px;
+            }
+
+            .sidebar .sidebar-link {
+                padding: 9px 10px;
+                gap: 10px;
+                font-size: 12px;
+            }
+
+            .sidebar .sidebar-section p {
+                margin-top: 20px;
+            }
+        }
+
+        @media (min-width: 651px) and (max-width: 800px) {
+            .sidebar .brand {
+                gap: 8px;
+            }
+
+            .sidebar .brand-mark {
+                width: 34px;
+                height: 34px;
+                font-size: 20px;
+            }
+
+            .sidebar .brand-name {
+                font-size: 14px;
+            }
+
+            .sidebar .brand-caption {
+                font-size: 10px;
+            }
+
+            .sidebar .sidebar-link {
+                padding-left: 8px;
+                padding-right: 8px;
+                gap: 8px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+
+        <header class="mobile-header">
+            <a href="{{ url_for('dashboard') }}" class="mobile-brand">
+                <img
+                    src="{{ url_for('static', filename='images/anchor-study-logo.png') }}"
+                    alt="Anchor Study logo"
+                >
+            </a>
+
+            <button
+                type="button"
+                class="mobile-menu-button"
+                id="mobileMenuButton"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+            >
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </header>
+
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+        <aside class="sidebar" id="sidebar">
+
+            <div class="brand">
+                <div class="brand-mark">⚓</div>
+                <div>
+                    <div class="brand-name">Anchor Study</div>
+                    <div class="brand-caption">Stay focused. Stay grounded.</div>
+                </div>
+
+                <button
+                    type="button"
+                    class="mobile-close-button"
+                    id="mobileCloseButton"
+                    aria-label="Close navigation menu"
+                >
+                    ×
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+
+                <div class="nav-label">Workspace</div>
+
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link active" aria-current="page">
+                    <span>⌂</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="{{ url_for('study') }}" class="sidebar-link">
+                    <span>▤</span>
+                    <span>Study Planner</span>
+                </a>
+
+                <a href="{{ url_for('timer') }}" class="sidebar-link">
+                    <span>◷</span>
+                    <span>Focus Timer</span>
+                </a>
+
+                <a href="{{ url_for('tasks') }}" class="sidebar-link">
+                    <span>✓</span>
+                    <span>Tasks</span>
+                </a>
+
+                <a href="{{ url_for('notes') }}" class="sidebar-link">
+                    <span>▧</span>
+                    <span>Notes</span>
+                </a>
+
+                <a href="{{ url_for('goals') }}" class="sidebar-link">
+                    <span>◎</span>
+                    <span>Goals</span>
+                </a>
+
+                <div class="sidebar-section">
+                    <p>Personal space</p>
+
+                    <a href="{{ url_for('scripture') }}" class="sidebar-link">
+                        <span>✧</span>
+                        <span>My Scriptures</span>
+                    </a>
+
+                    <a href="{{ url_for('prayer_journal') }}" class="sidebar-link">
+                        <span>♡</span>
+                        <span>Prayer Journal</span>
+                    </a>
+
+                    <a href="{{ url_for('devotionals') }}" class="sidebar-link">
+                        <span>✦</span>
+                        <span>Devotionals</span>
+                    </a>
+
+                    <a href="{{ url_for('reflections') }}" class="sidebar-link">
+                        <span>❋</span>
+                        <span>Reflections</span>
+                    </a>
+                </div>
+
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="nav-label">Account</div>
+
+                <a href="{{ url_for('profile') }}" class="sidebar-link">
+                    <span>◉</span>
+                    <span>Profile</span>
+                </a>
+
+                <a href="{{ url_for('settings') }}" class="sidebar-link">
+                    <span>⚙</span>
+                    <span>Settings</span>
+                </a>
+
+                <a href="{{ url_for('logout') }}" class="sidebar-link logout-link">
+                    <span>↪</span>
+                    <span>Log out</span>
+                </a>
+            </div>
+
+        </aside>
+
+        <main class="dashboard-main">
+
+            <header class="dashboard-topbar">
+                <div>
+                    <p class="dashboard-greeting">WELCOME BACK</p>
+                    <h1>Hi, {{ user.full_name.split()[0] }}.</h1>
+                </div>
+
+                <a href="{{ url_for('profile') }}" class="dashboard-user">
+                    <div class="user-avatar">
+                        {{ user.full_name[0].upper() }}
+                    </div>
+
+                    <div>
+                        <strong>{{ user.full_name }}</strong>
+                        <span>{{ user.course }}</span>
+                    </div>
+                </a>
+            </header>
+
+            <section class="dashboard-intro">
+                <div>
+                    <p class="eyebrow">YOUR SPACE</p>
+                    <h2>Stay focused. Stay grounded.</h2>
+                    <p>
+                        Keep your studies organised, make progress on your
+                        goals and make space for what matters.
+                    </p>
+                </div>
+
+                <div class="dashboard-anchor">⚓</div>
+            </section>
+
+            <section class="dashboard-section">
+                <div class="dashboard-section-heading">
+                    <p class="eyebrow">YOUR SPACE</p>
+                    <h2>Everything in one place.</h2>
+                </div>
+
+                <div class="dashboard-grid">
+
+                    <article class="dashboard-card">
+                        <div class="card-icon">📚</div>
+                        <h3>Study</h3>
+                        <p>Organise your subjects and plan your study sessions.</p>
+                        <a href="{{ url_for('study') }}" class="card-status">
+                            Open Study →
+                        </a>
+                    </article>
+
+                    <article class="dashboard-card">
+                        <div class="card-icon">⏱️</div>
+                        <h3>Study Timer</h3>
+                        <p>Drop anchor and focus on your study session without distractions.</p>
+                        <a href="{{ url_for('timer') }}" class="card-status">
+                            Open Timer →
+                        </a>
+                    </article>
+
+                    <article class="dashboard-card">
+                        <div class="card-icon">🙏</div>
+                        <h3>Faith</h3>
+                        <p>Keep Scripture, prayer and personal reflection close.</p>
+                        <span class="card-status">Coming next</span>
+                    </article>
+
+                </div>
+            </section>
+
+            <section class="dashboard-bottom-grid">
+
+                <article class="dashboard-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">STUDENT PROFILE</p>
+                            <h2>Your Anchor Study space</h2>
+                        </div>
+
+                        <a href="{{ url_for('profile') }}">Profile</a>
+                    </div>
+
+                    <div class="student-details">
+                        <div>
+                            <span>Name</span>
+                            <strong>{{ user.full_name }}</strong>
+                        </div>
+
+                        <div>
+                            <span>University</span>
+                            <strong>{{ user.university }}</strong>
+                        </div>
+
+                        <div>
+                            <span>Course</span>
+                            <strong>{{ user.course }}</strong>
+                        </div>
+
+                        <div>
+                            <span>Year</span>
+                            <strong>Year {{ user.year_of_study }}</strong>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="dashboard-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">STAY GROUNDED</p>
+                            <h2>Colossians 2:7</h2>
+                        </div>
+                    </div>
+
+                    <div class="faith-preview">
+                        <div class="faith-mark">“</div>
+                        <p>
+                            Rooted and built up in him, and stablished in the faith,
+                            as ye have been taught, abounding therein with thanksgiving.
+                        </p>
+                        <span>Colossians 2:7</span>
+                    </div>
+                </article>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <script>
+        const mobileMenuButton = document.getElementById("mobileMenuButton");
+        const mobileCloseButton = document.getElementById("mobileCloseButton");
+        const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
+        const sidebar = document.getElementById("sidebar");
+
+        function openMobileMenu() {
+            sidebar.classList.add("mobile-menu-open");
+            mobileMenuOverlay.classList.add("mobile-menu-visible");
+            mobileMenuButton.setAttribute("aria-expanded", "true");
+            document.body.classList.add("menu-open");
+        }
+
+        function closeMobileMenu() {
+            sidebar.classList.remove("mobile-menu-open");
+            mobileMenuOverlay.classList.remove("mobile-menu-visible");
+            mobileMenuButton.setAttribute("aria-expanded", "false");
+            document.body.classList.remove("menu-open");
+        }
+
+        mobileMenuButton.addEventListener("click", openMobileMenu);
+        mobileCloseButton.addEventListener("click", closeMobileMenu);
+        mobileMenuOverlay.addEventListener("click", closeMobileMenu);
+
+        document.querySelectorAll(".sidebar a").forEach(function(link) {
+            link.addEventListener("click", closeMobileMenu);
+        });
+    </script>
+
+</body>
+</html>

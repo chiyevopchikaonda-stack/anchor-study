@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ user.theme or 'anchor_classic' }}" data-doodles="{{ user.doodle_style or 'off' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prayer Journal | Anchor Study</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .sidebar {
+            width: 245px;
+            min-width: 245px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 28px 18px;
+            display: flex;
+            flex-direction: column;
+            background: var(--sidebar-bg, #101d35);
+            color: #ffffff;
+            overflow-y: auto;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 8px;
+            margin-bottom: 32px;
+        }
+
+        .sidebar-brand a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .brand-symbol {
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: #e9bd62;
+            color: #101d35;
+            font-size: 25px;
+        }
+
+        .brand-copy {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .brand-copy strong {
+            font-size: 17px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .brand-copy span {
+            font-size: 11px;
+            color: #c1cada;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .sidebar-section {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 17px;
+        }
+
+        .sidebar-section > p {
+            padding: 0 12px;
+            margin: 0 0 7px;
+            color: #aab6ca;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 43px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            color: #dce3ef;
+            font-size: 13px;
+            text-decoration: none;
+            transition: background 0.2s ease, color 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .sidebar-link > span:first-child {
+            width: 20px;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(255, 255, 255, 0.09);
+            color: #ffffff;
+        }
+
+        .sidebar-link.active {
+            background: #e9bd62;
+            color: #101d35;
+            font-weight: 700;
+        }
+
+        .sidebar-bottom {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: auto;
+            padding-top: 24px;
+        }
+
+        .logout-link {
+            margin-top: 4px;
+        }
+
+        .prayer-main {
+            width: calc(100% - 245px);
+            min-width: 0;
+            min-height: 100vh;
+            margin-left: 245px;
+            padding: 32px;
+            box-sizing: border-box;
+            overflow-wrap: anywhere;
+        }
+
+        .mobile-header {
+            display: none;
+        }
+
+        .sidebar-overlay {
+            display: none;
+        }
+
+        .prayer-page-header {
+            margin-bottom: 30px;
+        }
+
+        .prayer-page-header h1 {
+            margin: 8px 0;
+            color: var(--text-color, #142b4a);
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+        }
+
+        .prayer-page-header p {
+            color: var(--muted-text, #68768a);
+            line-height: 1.7;
+        }
+
+        .prayer-eyebrow {
+            color: #b58a36;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+        }
+
+        .prayer-panel {
+            margin-bottom: 28px;
+            padding: clamp(18px, 3vw, 28px);
+            background: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #e6eaf0);
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(20, 43, 74, 0.04);
+        }
+
+        .prayer-panel h2 {
+            margin: 0 0 8px;
+            color: var(--text-color, #142b4a);
+            font-size: 1.25rem;
+        }
+
+        .prayer-panel-intro {
+            margin: 0 0 22px;
+            color: var(--muted-text, #68768a);
+            line-height: 1.6;
+        }
+
+        .prayer-form {
+            display: grid;
+            gap: 18px;
+        }
+
+        .prayer-field {
+            display: grid;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .prayer-field label {
+            color: var(--text-color, #263b55);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .prayer-field input,
+        .prayer-field select,
+        .prayer-field textarea {
+            width: 100%;
+            min-width: 0;
+            padding: 12px 14px;
+            box-sizing: border-box;
+            border: 1px solid var(--border-color, #d9e0e9);
+            border-radius: 9px;
+            background: var(--input-bg, #ffffff);
+            color: var(--text-color, #263b55);
+            font: inherit;
+        }
+
+        .prayer-field textarea {
+            resize: vertical;
+            min-height: 150px;
+            line-height: 1.7;
+        }
+
+        .prayer-field input:focus,
+        .prayer-field select:focus,
+        .prayer-field textarea:focus {
+            outline: 2px solid rgba(181, 138, 54, 0.25);
+            border-color: #b58a36;
+        }
+
+        .prayer-submit {
+            justify-self: start;
+            padding: 12px 22px;
+            border: 0;
+            border-radius: 9px;
+            background: #101d35;
+            color: #ffffff;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .prayer-submit:hover {
+            background: #203d62;
+        }
+
+        .prayer-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .prayer-stat {
+            flex: 1 1 140px;
+            padding: 16px;
+            border-radius: 12px;
+            background: var(--surface-bg, #f3f6fa);
+        }
+
+        .prayer-stat strong {
+            display: block;
+            color: var(--text-color, #142b4a);
+            font-size: 1.5rem;
+        }
+
+        .prayer-stat span {
+            color: var(--muted-text, #68768a);
+            font-size: 0.85rem;
+        }
+
+        .prayer-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .prayer-card {
+            min-width: 0;
+            padding: 20px;
+            border: 1px solid var(--border-color, #e6eaf0);
+            border-radius: 14px;
+            background: var(--card-bg, #ffffff);
+        }
+
+        .prayer-card.is-answered {
+            border-left: 4px solid #6b9a79;
+        }
+
+        .prayer-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .prayer-card h3 {
+            margin: 0;
+            color: var(--text-color, #142b4a);
+            font-size: 1.05rem;
+            overflow-wrap: anywhere;
+        }
+
+        .prayer-category {
+            display: inline-block;
+            margin-top: 7px;
+            color: #8b6b2b;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .prayer-status {
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #fff4dc;
+            color: #825d17;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .prayer-card.is-answered .prayer-status {
+            background: #e7f4e9;
+            color: #356846;
+        }
+
+        .prayer-card-content {
+            color: var(--body-text, #43536a);
+            line-height: 1.8;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .prayer-card-date {
+            margin-top: 14px;
+            color: var(--muted-text, #8490a0);
+            font-size: 0.8rem;
+        }
+
+        .prayer-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .prayer-actions form {
+            margin: 0;
+        }
+
+        .prayer-action-button {
+            padding: 9px 12px;
+            border: 1px solid var(--border-color, #d9e0e9);
+            border-radius: 8px;
+            background: var(--card-bg, #ffffff);
+            color: var(--text-color, #263b55);
+            font: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .prayer-action-button:hover {
+            background: var(--surface-bg, #f3f6fa);
+        }
+
+        .prayer-delete {
+            color: #a33c3c;
+            border-color: #efdada;
+        }
+
+        .prayer-empty {
+            padding: 35px 20px;
+            text-align: center;
+            border: 1px dashed var(--border-color, #d9e0e9);
+            border-radius: 12px;
+            color: var(--muted-text, #68768a);
+        }
+
+        .prayer-empty span {
+            display: block;
+            margin-bottom: 12px;
+            font-size: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.25s ease;
+            }
+
+            .sidebar.mobile-menu-open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(8, 16, 31, 0.55);
+                z-index: 999;
+            }
+
+            .sidebar-overlay.mobile-menu-visible {
+                display: block;
+            }
+
+            body.menu-open {
+                overflow: hidden;
+            }
+
+            .prayer-main {
+                width: 100%;
+                margin-left: 0;
+                padding: 22px;
+            }
+
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 24px;
+            }
+
+            .mobile-brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: inherit;
+                text-decoration: none;
+            }
+
+            .mobile-brand img {
+                width: 42px;
+                height: 42px;
+                object-fit: contain;
+            }
+
+            .mobile-brand div {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+            }
+
+            .mobile-brand strong {
+                font-size: 15px;
+            }
+
+            .mobile-brand span {
+                font-size: 11px;
+                opacity: 0.7;
+            }
+
+            .mobile-menu-button,
+            .sidebar-close {
+                width: 42px;
+                height: 42px;
+                border: 1px solid var(--border-color, #e5e7eb);
+                border-radius: 10px;
+                background: var(--card-bg, #ffffff);
+                color: var(--text-color, #101d35);
+                font-size: 23px;
+                cursor: pointer;
+            }
+
+            .sidebar-close {
+                display: block;
+                align-self: flex-end;
+                margin-bottom: 18px;
+                background: rgba(255, 255, 255, 0.08);
+                border-color: rgba(255, 255, 255, 0.15);
+                color: #ffffff;
+            }
+        }
+
+        @media (min-width: 901px) {
+            .sidebar-close {
+                display: none;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .prayer-main {
+                padding: 16px;
+            }
+
+            .prayer-page-header {
+                margin-bottom: 22px;
+            }
+
+            .prayer-panel {
+                padding: 18px;
+            }
+
+            .prayer-card {
+                padding: 16px;
+            }
+
+            .prayer-submit {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="appSidebar">
+            <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Close navigation">×</button>
+
+            <div class="sidebar-brand">
+                <a href="{{ url_for('dashboard') }}">
+                    <span class="brand-symbol">⚓</span>
+                    <span class="brand-copy">
+                        <strong>Anchor Study</strong>
+                        <span>Stay focused. Stay grounded.</span>
+                    </span>
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+                    <span>⌂</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <div class="sidebar-section">
+                    <p>Workspace</p>
+
+                    <a href="{{ url_for('study') }}" class="sidebar-link">
+                        <span>▤</span>
+                        <span>Study Planner</span>
+                    </a>
+
+                    <a href="{{ url_for('timer') }}" class="sidebar-link">
+                        <span>◷</span>
+                        <span>Focus Timer</span>
+                    </a>
+
+                    <a href="{{ url_for('tasks') }}" class="sidebar-link">
+                        <span>✓</span>
+                        <span>Tasks</span>
+                    </a>
+
+                    <a href="{{ url_for('notes') }}" class="sidebar-link">
+                        <span>▧</span>
+                        <span>Notes</span>
+                    </a>
+
+                    <a href="{{ url_for('goals') }}" class="sidebar-link">
+                        <span>◎</span>
+                        <span>Goals</span>
+                    </a>
+                </div>
+
+                <div class="sidebar-section">
+                    <p>Personal Space</p>
+
+                    <a href="{{ url_for('scripture') }}" class="sidebar-link">
+                        <span>♧</span>
+                        <span>My Scriptures</span>
+                    </a>
+
+                    <a href="{{ url_for('prayer_journal') }}" class="sidebar-link active">
+                        <span>🙏</span>
+                        <span>Prayer Journal</span>
+                    </a>
+
+                    <a href="{{ url_for('devotionals') }}" class="sidebar-link">
+                        <span>✧</span>
+                        <span>Devotionals</span>
+                    </a>
+
+                    <a href="{{ url_for('reflections') }}" class="sidebar-link">
+                        <span>♡</span>
+                        <span>Reflections</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="sidebar-section">
+                    <p>Account</p>
+
+                    <a href="{{ url_for('profile') }}" class="sidebar-link">
+                        <span>♙</span>
+                        <span>Profile</span>
+                    </a>
+
+                    <a href="{{ url_for('settings') }}" class="sidebar-link">
+                        <span>⚙</span>
+                        <span>Settings</span>
+                    </a>
+
+                    <a href="{{ url_for('logout') }}" class="sidebar-link logout-link">
+                        <span>↪</span>
+                        <span>Log Out</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <main class="prayer-main">
+            <header class="mobile-header">
+                <a href="{{ url_for('dashboard') }}" class="mobile-brand">
+                    <img
+                        src="{{ url_for('static', filename='images/anchor-study-logo.png') }}"
+                        alt="Anchor Study logo"
+                    >
+                    <div>
+                        <strong>Anchor Study</strong>
+                        <span>Stay focused. Stay grounded.</span>
+                    </div>
+                </a>
+
+                <button type="button" class="mobile-menu-button" id="sidebarOpen" aria-label="Open navigation">☰</button>
+            </header>
+
+            <header class="prayer-page-header">
+                <span class="prayer-eyebrow">Your faith space</span>
+                <h1>Prayer Journal</h1>
+                <p>A quiet place to record your prayers, remember what matters and keep track of answered prayers.</p>
+            </header>
+
+            <section class="prayer-panel">
+                <h2>Write a prayer</h2>
+                <p class="prayer-panel-intro">Bring what's on your heart into words.</p>
+
+                <form method="POST" class="prayer-form">
+                    <div class="prayer-field">
+                        <label for="title">Prayer title</label>
+                        <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            maxlength="200"
+                            placeholder="e.g. Strength during exams"
+                            required
+                        >
+                    </div>
+
+                    <div class="prayer-field">
+                        <label for="category">Category</label>
+                        <select id="category" name="category">
+                            <option value="Personal">Personal</option>
+                            <option value="Studies">Studies</option>
+                            <option value="Family">Family</option>
+                            <option value="Church">Church</option>
+                            <option value="Friends">Friends</option>
+                            <option value="Gratitude">Gratitude</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="prayer-field">
+                        <label for="content">Your prayer</label>
+                        <textarea
+                            id="content"
+                            name="content"
+                            placeholder="Write your prayer here..."
+                            required
+                        ></textarea>
+                    </div>
+
+                    <button type="submit" class="prayer-submit">Save prayer</button>
+                </form>
+            </section>
+
+            <section class="prayer-panel">
+                <h2>Your prayers</h2>
+                <p class="prayer-panel-intro">Keep your prayer journey in one place.</p>
+
+                <div class="prayer-summary">
+                    <div class="prayer-stat">
+                        <strong>{{ total_prayers }}</strong>
+                        <span>Total prayers</span>
+                    </div>
+
+                    <div class="prayer-stat">
+                        <strong>{{ answered_prayers }}</strong>
+                        <span>Marked answered</span>
+                    </div>
+
+                    <div class="prayer-stat">
+                        <strong>{{ total_prayers - answered_prayers }}</strong>
+                        <span>Still praying</span>
+                    </div>
+                </div>
+
+                {% if prayers %}
+                    <div class="prayer-list">
+                        {% for prayer in prayers %}
+                            <article class="prayer-card {% if prayer.answered %}is-answered{% endif %}">
+                                <div class="prayer-card-header">
+                                    <div>
+                                        <h3>{{ prayer.title }}</h3>
+                                        <span class="prayer-category">{{ prayer.category }}</span>
+                                    </div>
+
+                                    <span class="prayer-status">
+                                        {% if prayer.answered %}Answered{% else %}Still praying{% endif %}
+                                    </span>
+                                </div>
+
+                                <div class="prayer-card-content">{{ prayer.content }}</div>
+
+                                <div class="prayer-card-date">
+                                    Added {{ prayer.created_at.strftime("%d %b %Y") }}
+                                </div>
+
+                                <div class="prayer-actions">
+                                    <form method="POST" action="{{ url_for('mark_prayer_answered', prayer_id=prayer.id) }}">
+                                        <button type="submit" class="prayer-action-button">
+                                            {% if prayer.answered %}Mark still praying{% else %}Mark answered{% endif %}
+                                        </button>
+                                    </form>
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for('delete_prayer', prayer_id=prayer.id) }}"
+                                        onsubmit="return confirm('Delete this prayer entry?');"
+                                    >
+                                        <button type="submit" class="prayer-action-button prayer-delete">Delete</button>
+                                    </form>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="prayer-empty">
+                        <span>🙏</span>
+                        <strong>Your journal starts here</strong>
+                        <p>Save your first prayer above. You can mark it answered whenever you want.</p>
+                    </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById("appSidebar");
+        const sidebarOpen = document.getElementById("sidebarOpen");
+        const sidebarClose = document.getElementById("sidebarClose");
+        const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+        function openSidebar() {
+            sidebar.classList.add("mobile-menu-open");
+            sidebarOverlay.classList.add("mobile-menu-visible");
+            document.body.classList.add("menu-open");
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove("mobile-menu-open");
+            sidebarOverlay.classList.remove("mobile-menu-visible");
+            document.body.classList.remove("menu-open");
+        }
+
+        if (sidebarOpen) {
+            sidebarOpen.addEventListener("click", openSidebar);
+        }
+
+        if (sidebarClose) {
+            sidebarClose.addEventListener("click", closeSidebar);
+        }
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener("click", closeSidebar);
+        }
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "Escape") {
+                closeSidebar();
+            }
+        });
+    </script>
+</body>
+</html>
+

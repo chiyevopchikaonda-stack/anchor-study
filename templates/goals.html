@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ user.theme or 'anchor_classic' }}" data-doodles="{{ user.doodle_style or 'off' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goals | Anchor Study</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .sidebar {
+            width: 245px;
+            min-width: 245px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 28px 18px;
+            display: flex;
+            flex-direction: column;
+            background: var(--sidebar-bg, #101d35);
+            color: #ffffff;
+            overflow-y: auto;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 8px;
+            margin-bottom: 32px;
+        }
+
+        .sidebar-brand a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .brand-symbol {
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: #e9bd62;
+            color: #101d35;
+            font-size: 25px;
+        }
+
+        .brand-copy {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .brand-copy strong {
+            font-size: 17px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .brand-copy span {
+            font-size: 11px;
+            color: #c1cada;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .sidebar-section {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 17px;
+        }
+
+        .sidebar-section > p {
+            padding: 0 12px;
+            margin: 0 0 7px;
+            color: #aab6ca;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 43px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            color: #dce3ef;
+            font-size: 13px;
+            text-decoration: none;
+            transition: background 0.2s ease, color 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .sidebar-link > span:first-child {
+            width: 20px;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(255, 255, 255, 0.09);
+            color: #ffffff;
+        }
+
+        .sidebar-link.active {
+            background: #e9bd62;
+            color: #101d35;
+            font-weight: 700;
+        }
+
+        .sidebar-bottom {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: auto;
+            padding-top: 24px;
+        }
+
+        .logout-link {
+            margin-top: 4px;
+        }
+
+        .goals-main {
+            width: calc(100% - 245px);
+            min-height: 100vh;
+            margin-left: 245px;
+            padding: 32px;
+            box-sizing: border-box;
+        }
+
+        .mobile-header {
+            display: none;
+        }
+
+        .sidebar-overlay {
+            display: none;
+        }
+
+        .goal-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .goal-item {
+            padding: 18px;
+            border: 1px solid var(--border-color, #e5e7eb);
+            border-radius: 14px;
+        }
+
+        .goal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .goal-header > div {
+            min-width: 0;
+        }
+
+        .goal-header h3 {
+            overflow-wrap: anywhere;
+        }
+
+        .goal-progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0 12px;
+        }
+
+        .goal-progress-bar {
+            flex: 1;
+            height: 9px;
+            overflow: hidden;
+            border-radius: 20px;
+            background: var(--border-color, #e5e7eb);
+        }
+
+        .goal-progress-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: #d8ad51;
+            transition: width 0.3s ease;
+        }
+
+        .goal-progress > strong {
+            min-width: 42px;
+            text-align: right;
+        }
+
+        .goal-footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 18px;
+            font-size: 12px;
+        }
+
+        .goal-update-form {
+            padding-top: 14px;
+            border-top: 1px solid var(--border-color, #e5e7eb);
+        }
+
+        .goal-update-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .goal-update-form > div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .goal-update-form input {
+            width: 100%;
+            max-width: 110px;
+            box-sizing: border-box;
+        }
+
+        .goal-completed {
+            opacity: 0.85;
+        }
+
+        .goal-completed .goal-progress-fill {
+            background: #548b70;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.25s ease;
+            }
+
+            .sidebar.mobile-menu-open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(8, 16, 31, 0.55);
+                z-index: 999;
+            }
+
+            .sidebar-overlay.mobile-menu-visible {
+                display: block;
+            }
+
+            body.menu-open {
+                overflow: hidden;
+            }
+
+            .goals-main {
+                width: 100%;
+                margin-left: 0;
+                padding: 22px;
+            }
+
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 24px;
+            }
+
+            .mobile-brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: inherit;
+                text-decoration: none;
+            }
+
+            .mobile-brand img {
+                width: 42px;
+                height: 42px;
+                object-fit: contain;
+            }
+
+            .mobile-brand div {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+            }
+
+            .mobile-brand strong {
+                font-size: 15px;
+            }
+
+            .mobile-brand span {
+                font-size: 11px;
+                opacity: 0.7;
+            }
+
+            .mobile-menu-button,
+            .sidebar-close {
+                width: 42px;
+                height: 42px;
+                border: 1px solid var(--border-color, #e5e7eb);
+                border-radius: 10px;
+                background: var(--card-bg, #ffffff);
+                color: var(--text-color, #101d35);
+                font-size: 23px;
+                cursor: pointer;
+            }
+
+            .sidebar-close {
+                display: block;
+                align-self: flex-end;
+                margin-bottom: 18px;
+                background: rgba(255, 255, 255, 0.08);
+                border-color: rgba(255, 255, 255, 0.15);
+                color: #ffffff;
+            }
+        }
+
+        @media (min-width: 901px) {
+            .sidebar-close {
+                display: none;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .goals-main {
+                padding: 16px;
+            }
+
+            .dashboard-topbar {
+                align-items: flex-start;
+                gap: 14px;
+            }
+
+            .dashboard-user {
+                max-width: 48%;
+            }
+
+            .dashboard-user strong,
+            .dashboard-user span {
+                overflow-wrap: anywhere;
+            }
+
+            .dashboard-bottom-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .task-form-row {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .goal-item {
+                padding: 14px;
+            }
+
+            .goal-header h3 {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="appSidebar">
+            <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Close navigation">×</button>
+
+            <div class="sidebar-brand">
+                <a href="{{ url_for('dashboard') }}">
+                    <span class="brand-symbol">⚓</span>
+                    <span class="brand-copy">
+                        <strong>Anchor Study</strong>
+                        <span>Stay focused. Stay grounded.</span>
+                    </span>
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+                    <span>⌂</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <div class="sidebar-section">
+                    <p>Workspace</p>
+
+                    <a href="{{ url_for('study') }}" class="sidebar-link">
+                        <span>▤</span>
+                        <span>Study Planner</span>
+                    </a>
+
+                    <a href="{{ url_for('timer') }}" class="sidebar-link">
+                        <span>◷</span>
+                        <span>Focus Timer</span>
+                    </a>
+
+                    <a href="{{ url_for('tasks') }}" class="sidebar-link">
+                        <span>✓</span>
+                        <span>Tasks</span>
+                    </a>
+
+                    <a href="{{ url_for('notes') }}" class="sidebar-link">
+                        <span>▧</span>
+                        <span>Notes</span>
+                    </a>
+
+                    <a href="{{ url_for('goals') }}" class="sidebar-link active">
+                        <span>◎</span>
+                        <span>Goals</span>
+                    </a>
+                </div>
+
+                <div class="sidebar-section">
+                    <p>Personal Space</p>
+
+                    <a href="{{ url_for('scripture') }}" class="sidebar-link">
+                        <span>♧</span>
+                        <span>My Scriptures</span>
+                    </a>
+
+                    <a href="{{ url_for('prayer_journal') }}" class="sidebar-link">
+                        <span>🙏</span>
+                        <span>Prayer Journal</span>
+                    </a>
+
+                    <a href="{{ url_for('devotionals') }}" class="sidebar-link">
+                        <span>✧</span>
+                        <span>Devotionals</span>
+                    </a>
+
+                    <a href="{{ url_for('reflections') }}" class="sidebar-link">
+                        <span>♡</span>
+                        <span>Reflections</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="sidebar-section">
+                    <p>Account</p>
+
+                    <a href="{{ url_for('profile') }}" class="sidebar-link">
+                        <span>♙</span>
+                        <span>Profile</span>
+                    </a>
+
+                    <a href="{{ url_for('settings') }}" class="sidebar-link">
+                        <span>⚙</span>
+                        <span>Settings</span>
+                    </a>
+
+                    <a href="{{ url_for('logout') }}" class="sidebar-link logout-link">
+                        <span>↪</span>
+                        <span>Log Out</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <main class="dashboard-main goals-main">
+            <header class="mobile-header">
+                <a href="{{ url_for('dashboard') }}" class="mobile-brand">
+                    <img src="{{ url_for('static', filename='images/anchor-study-logo.png') }}" alt="Anchor Study logo">
+                    <div>
+                        <strong>Anchor Study</strong>
+                        <span>Stay focused. Stay grounded.</span>
+                    </div>
+                </a>
+
+                <button type="button" class="mobile-menu-button" id="sidebarOpen" aria-label="Open navigation">☰</button>
+            </header>
+
+            <header class="dashboard-topbar">
+                <div>
+                    <p class="dashboard-greeting">YOUR GOALS</p>
+                    <h1>Keep moving forward.</h1>
+                </div>
+
+                <a href="{{ url_for('profile') }}" class="dashboard-user">
+                    <div class="user-avatar">
+                        {{ user.full_name[0].upper() }}
+                    </div>
+                    <div>
+                        <strong>{{ user.full_name }}</strong>
+                        <span>{{ user.course }}</span>
+                    </div>
+                </a>
+            </header>
+
+            <section class="dashboard-intro">
+                <div>
+                    <p class="eyebrow">GOALS</p>
+                    <h2>Give your plans somewhere to go.</h2>
+                    <p>Set goals, track your progress and keep the bigger picture in sight.</p>
+                </div>
+
+                <div class="dashboard-anchor">🎯</div>
+            </section>
+
+            <section class="dashboard-bottom-grid">
+                <article class="dashboard-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">NEW GOAL</p>
+                            <h2>What are you working towards?</h2>
+                        </div>
+                    </div>
+
+                    <form method="POST" class="task-form">
+                        <div class="form-group">
+                            <label for="title">Goal</label>
+                            <input
+                                type="text"
+                                id="title"
+                                name="title"
+                                placeholder="e.g. Pass all my semester exams"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                rows="4"
+                                placeholder="What does achieving this goal look like?"
+                            ></textarea>
+                        </div>
+
+                        <div class="task-form-row">
+                            <div class="form-group">
+                                <label for="target_date">Target date</label>
+                                <input type="date" id="target_date" name="target_date">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="progress">Starting progress</label>
+                                <input
+                                    type="number"
+                                    id="progress"
+                                    name="progress"
+                                    min="0"
+                                    max="100"
+                                    value="0"
+                                >
+                            </div>
+                        </div>
+
+                        <button type="submit" class="primary-button">Create Goal</button>
+                    </form>
+                </article>
+
+                <article class="dashboard-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">YOUR GOALS</p>
+                            <h2>Keep going.</h2>
+                        </div>
+                    </div>
+
+                    <div class="goal-list">
+                        {% if goals %}
+                            {% for goal in goals %}
+                                <div class="goal-item {% if goal.completed %}goal-completed{% endif %}">
+                                    <div class="goal-header">
+                                        <div>
+                                            <h3>{{ goal.title }}</h3>
+
+                                            {% if goal.description %}
+                                                <p>{{ goal.description }}</p>
+                                            {% endif %}
+                                        </div>
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for('delete_goal', goal_id=goal.id) }}"
+                                            onsubmit="return confirm('Are you sure you want to delete this goal?');"
+                                        >
+                                            <button type="submit" class="task-delete" aria-label="Delete goal">×</button>
+                                        </form>
+                                    </div>
+
+                                    <div class="goal-progress">
+                                        <div class="goal-progress-bar">
+                                            <div
+                                                class="goal-progress-fill"
+                                                style="width: {{ goal.progress }}%;"
+                                            ></div>
+                                        </div>
+
+                                        <strong>{{ goal.progress }}%</strong>
+                                    </div>
+
+                                    <div class="goal-footer">
+                                        {% if goal.target_date %}
+                                            <span>📅 {{ goal.target_date.strftime('%d %b %Y') }}</span>
+                                        {% endif %}
+
+                                        {% if goal.completed %}
+                                            <span>✓ Completed</span>
+                                        {% else %}
+                                            <span>In progress</span>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if not goal.completed %}
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for('update_goal', goal_id=goal.id) }}"
+                                            class="goal-update-form"
+                                        >
+                                            <label for="progress-{{ goal.id }}">Update progress</label>
+
+                                            <div>
+                                                <input
+                                                    type="number"
+                                                    id="progress-{{ goal.id }}"
+                                                    name="progress"
+                                                    min="0"
+                                                    max="100"
+                                                    value="{{ goal.progress }}"
+                                                    required
+                                                >
+
+                                                <button type="submit" class="secondary-button">Update</button>
+                                            </div>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">
+                                <div class="card-icon">🎯</div>
+                                <h3>No goals yet.</h3>
+                                <p>Create your first goal and start tracking your progress.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </article>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById("appSidebar");
+        const sidebarOpen = document.getElementById("sidebarOpen");
+        const sidebarClose = document.getElementById("sidebarClose");
+        const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+        function openSidebar() {
+            sidebar.classList.add("mobile-menu-open");
+            sidebarOverlay.classList.add("mobile-menu-visible");
+            document.body.classList.add("menu-open");
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove("mobile-menu-open");
+            sidebarOverlay.classList.remove("mobile-menu-visible");
+            document.body.classList.remove("menu-open");
+        }
+
+        if (sidebarOpen) {
+            sidebarOpen.addEventListener("click", openSidebar);
+        }
+
+        if (sidebarClose) {
+            sidebarClose.addEventListener("click", closeSidebar);
+        }
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener("click", closeSidebar);
+        }
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "Escape") {
+                closeSidebar();
+            }
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ user.theme or 'anchor_classic' }}" data-doodles="{{ user.doodle_style or 'off' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Settings | Anchor Study</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--page-bg, #f7f8fc);
+            color: var(--text-primary, #17243d);
+            font-family: Arial, sans-serif;
+        }
+
+        .app-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 245px;
+            height: 100vh;
+            padding: 28px 18px;
+            background: var(--sidebar-bg, #ffffff);
+            border-right: 1px solid var(--border-color, #e8eaf0);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 0 8px;
+            margin-bottom: 34px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 43px;
+            height: 43px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 13px;
+            background: #102447;
+            color: #e6bd65;
+            font-size: 25px;
+        }
+
+        .brand-name {
+            color: var(--text-primary, #17243d);
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .brand-tagline {
+            margin-top: 4px;
+            color: var(--text-muted, #7b8496);
+            font-size: 11px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 26px;
+        }
+
+        .sidebar-label {
+            padding: 0 12px;
+            margin-bottom: 10px;
+            color: var(--text-muted, #8b93a3);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.3px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 12px;
+            margin-bottom: 4px;
+            border-radius: 10px;
+            color: var(--text-secondary, #596579);
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .sidebar-link:hover {
+            background: var(--hover-bg, #f1f3f8);
+            color: var(--text-primary, #17243d);
+        }
+
+        .sidebar-link.active {
+            background: #f5e8c9;
+            color: #102447;
+            font-weight: 700;
+        }
+
+        .sidebar-icon {
+            width: 19px;
+            flex-shrink: 0;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding-top: 18px;
+            border-top: 1px solid var(--border-color, #e8eaf0);
+        }
+
+        .settings-main {
+            min-height: 100vh;
+            margin-left: 245px;
+            padding: 42px 40px;
+        }
+
+        .settings-container {
+            width: 100%;
+            max-width: 1050px;
+            margin: 0 auto;
+        }
+
+        .settings-header {
+            margin-bottom: 30px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 27px;
+            color: var(--text-secondary, #596579);
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: #b4862e;
+        }
+
+        .eyebrow {
+            margin: 0 0 10px;
+            color: #b4862e;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+        }
+
+        .settings-header h1 {
+            margin: 0 0 10px;
+            color: var(--text-primary, #17243d);
+            font-size: 32px;
+        }
+
+        .settings-header > p:last-child {
+            margin: 0;
+            color: var(--text-muted, #7b8496);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .settings-card {
+            padding: 30px;
+            border: 1px solid var(--border-color, #e8eaf0);
+            border-radius: 18px;
+            background: var(--card-bg, #ffffff);
+            box-shadow: 0 5px 20px rgba(16, 36, 71, 0.04);
+        }
+
+        .settings-card h2 {
+            margin: 0 0 10px;
+            color: var(--text-primary, #17243d);
+            font-size: 19px;
+        }
+
+        .settings-card p {
+            color: var(--text-muted, #7b8496);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .settings-card .theme-section > p,
+        .doodle-settings > p {
+            margin: 0;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+            margin-top: 24px;
+        }
+
+        .theme-option {
+            position: relative;
+            display: block;
+            min-width: 0;
+            cursor: pointer;
+        }
+
+        .theme-option input,
+        .doodle-style-option input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        .theme-card {
+            height: 100%;
+            padding: 16px;
+            border: 2px solid var(--border-color, #e8eaf0);
+            border-radius: 14px;
+            background: var(--card-bg, #ffffff);
+            transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .theme-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .theme-option input:checked + .theme-card {
+            border-color: #c9a04d;
+            box-shadow: 0 0 0 2px rgba(201, 160, 77, 0.16);
+        }
+
+        .theme-option input:focus-visible + .theme-card {
+            outline: 3px solid #9eb5d7;
+            outline-offset: 3px;
+        }
+
+        .theme-swatches {
+            display: flex;
+            height: 72px;
+            margin-bottom: 14px;
+            overflow: hidden;
+            border-radius: 9px;
+        }
+
+        .theme-swatch {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .theme-name {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: var(--text-primary, #17243d);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .theme-check {
+            color: #b4862e;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        .theme-description {
+            margin: 7px 0 0;
+            color: var(--text-muted, #7b8496);
+            font-size: 11px !important;
+            line-height: 1.6 !important;
+        }
+
+        .settings-divider {
+            height: 1px;
+            margin: 30px 0;
+            background: var(--border-color, #e8eaf0);
+        }
+
+        .doodle-style-options {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 22px;
+        }
+
+        .doodle-style-option {
+            position: relative;
+            display: block;
+            min-width: 0;
+            cursor: pointer;
+        }
+
+        .doodle-style-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 8px;
+            padding: 18px;
+            border: 2px solid var(--border-color, #e8eaf0);
+            border-radius: 13px;
+            background: var(--card-bg, #ffffff);
+            transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .doodle-style-card strong {
+            color: var(--text-primary, #17243d);
+            font-size: 13px;
+        }
+
+        .doodle-style-card > span {
+            color: var(--text-muted, #7b8496);
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .doodle-style-option:hover .doodle-style-card {
+            transform: translateY(-2px);
+        }
+
+        .doodle-style-option input:checked + .doodle-style-card {
+            border-color: #c9a04d;
+            box-shadow: 0 0 0 2px rgba(201, 160, 77, 0.16);
+        }
+
+        .doodle-style-option input:focus-visible + .doodle-style-card {
+            outline: 3px solid #9eb5d7;
+            outline-offset: 3px;
+        }
+
+        .theme-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 26px;
+        }
+
+        .theme-actions button,
+        .secondary-button,
+        .primary-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            padding: 11px 18px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .primary-button {
+            border: 1px solid #102447;
+            background: #102447;
+            color: #ffffff;
+        }
+
+        .primary-button:hover {
+            background: #1b365f;
+            transform: translateY(-1px);
+        }
+
+        .secondary-button {
+            border: 1px solid var(--border-color, #dfe3eb);
+            background: var(--card-bg, #ffffff);
+            color: var(--text-primary, #17243d);
+        }
+
+        .secondary-button:hover {
+            background: var(--hover-bg, #f1f3f8);
+        }
+
+        .settings-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .settings-section > div {
+            min-width: 0;
+        }
+
+        .settings-section h2 {
+            margin-bottom: 8px;
+        }
+
+        .settings-section p {
+            margin: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .settings-section .primary-button,
+        .settings-section .secondary-button {
+            flex-shrink: 0;
+        }
+
+        .mobile-header,
+        .sidebar-overlay {
+            display: none;
+        }
+
+        @media (max-width: 1000px) {
+            .settings-main {
+                padding: 35px 25px;
+            }
+
+            .doodle-style-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .app-sidebar {
+                width: 270px;
+                max-width: 85vw;
+                transform: translateX(-100%);
+                transition: transform 0.25s ease;
+                box-shadow: none;
+            }
+
+            .app-sidebar.mobile-menu-visible {
+                transform: translateX(0);
+                box-shadow: 10px 0 35px rgba(0, 0, 0, 0.12);
+            }
+
+            .sidebar-overlay {
+                position: fixed;
+                inset: 0;
+                z-index: 999;
+                background: rgba(12, 25, 46, 0.45);
+            }
+
+            .sidebar-overlay.menu-open {
+                display: block;
+            }
+
+            .mobile-header {
+                position: sticky;
+                top: 0;
+                z-index: 900;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 12px 18px;
+                border-bottom: 1px solid var(--border-color, #e8eaf0);
+                background: var(--card-bg, #ffffff);
+            }
+
+            .mobile-brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: var(--text-primary, #17243d);
+                font-size: 15px;
+                font-weight: 700;
+                text-decoration: none;
+            }
+
+            .mobile-brand img {
+                width: 35px;
+                height: 35px;
+                object-fit: contain;
+            }
+
+            .menu-button {
+                width: 40px;
+                height: 40px;
+                border: 1px solid var(--border-color, #e8eaf0);
+                border-radius: 10px;
+                background: var(--card-bg, #ffffff);
+                color: var(--text-primary, #17243d);
+                font-size: 22px;
+                cursor: pointer;
+            }
+
+            .sidebar-close {
+                display: flex;
+                justify-content: flex-end;
+                margin-bottom: 18px;
+            }
+
+            .sidebar-close button {
+                width: 36px;
+                height: 36px;
+                border: none;
+                border-radius: 9px;
+                background: var(--hover-bg, #f1f3f8);
+                color: var(--text-primary, #17243d);
+                font-size: 21px;
+                cursor: pointer;
+            }
+
+            .settings-main {
+                margin-left: 0;
+                padding: 27px 16px 35px;
+            }
+
+            .settings-header h1 {
+                font-size: 28px;
+            }
+
+            .settings-card {
+                padding: 22px 17px;
+            }
+
+            .theme-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .theme-card {
+                padding: 12px;
+            }
+
+            .theme-swatches {
+                height: 55px;
+            }
+
+            .theme-name {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .theme-actions {
+                flex-direction: column;
+            }
+
+            .theme-actions > * {
+                width: 100%;
+            }
+
+            .settings-section {
+                align-items: stretch;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .settings-section .primary-button,
+            .settings-section .secondary-button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .theme-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (min-width: 701px) {
+            .sidebar-close {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="mobile-header">
+        <a href="{{ url_for('dashboard') }}" class="mobile-brand">
+            <img src="{{ url_for('static', filename='images/anchor-study-logo.png') }}" alt="Anchor Study logo">
+            <span>Anchor Study</span>
+        </a>
+
+        <button type="button" class="menu-button" id="sidebarOpen" aria-label="Open navigation menu" aria-controls="appSidebar" aria-expanded="false">
+            ☰
+        </button>
+    </header>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="app-sidebar" id="appSidebar">
+
+        <div class="sidebar-close">
+            <button type="button" id="sidebarClose" aria-label="Close navigation menu">×</button>
+        </div>
+
+        <a href="{{ url_for('dashboard') }}" class="sidebar-brand">
+            <div class="brand-icon">⚓</div>
+            <div>
+                <div class="brand-name">Anchor Study</div>
+                <div class="brand-tagline">Stay focused. Stay grounded.</div>
+            </div>
+        </a>
+
+        <nav>
+            <div class="sidebar-section">
+                <div class="sidebar-label">Workspace</div>
+
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+                    <span class="sidebar-icon">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="{{ url_for('study') }}" class="sidebar-link">
+                    <span class="sidebar-icon">▤</span>
+                    <span>Study Planner</span>
+                </a>
+
+                <a href="{{ url_for('timer') }}" class="sidebar-link">
+                    <span class="sidebar-icon">◷</span>
+                    <span>Focus Timer</span>
+                </a>
+
+                <a href="{{ url_for('tasks') }}" class="sidebar-link">
+                    <span class="sidebar-icon">☑</span>
+                    <span>Tasks</span>
+                </a>
+
+                <a href="{{ url_for('notes') }}" class="sidebar-link">
+                    <span class="sidebar-icon">▧</span>
+                    <span>Notes</span>
+                </a>
+
+                <a href="{{ url_for('goals') }}" class="sidebar-link">
+                    <span class="sidebar-icon">◎</span>
+                    <span>Goals</span>
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-label">Personal Space</div>
+
+                <a href="{{ url_for('scripture') }}" class="sidebar-link">
+                    <span class="sidebar-icon">✧</span>
+                    <span>My Scriptures</span>
+                </a>
+
+                <a href="{{ url_for('prayer_journal') }}" class="sidebar-link">
+                    <span class="sidebar-icon">♡</span>
+                    <span>Prayer Journal</span>
+                </a>
+
+                <a href="{{ url_for('devotionals') }}" class="sidebar-link">
+                    <span class="sidebar-icon">☼</span>
+                    <span>Devotionals</span>
+                </a>
+
+                <a href="{{ url_for('reflections') }}" class="sidebar-link">
+                    <span class="sidebar-icon">✎</span>
+                    <span>Reflections</span>
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-label">Account</div>
+
+                <a href="{{ url_for('profile') }}" class="sidebar-link">
+                    <span class="sidebar-icon">♙</span>
+                    <span>Profile</span>
+                </a>
+
+                <a href="{{ url_for('settings') }}" class="sidebar-link active" aria-current="page">
+                    <span class="sidebar-icon">⚙</span>
+                    <span>Settings</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}" class="sidebar-link">
+                <span class="sidebar-icon">⇥</span>
+                <span>Log Out</span>
+            </a>
+        </div>
+
+    </aside>
+
+    <main class="settings-main">
+        <div class="settings-container">
+
+            <header class="settings-header">
+                <a href="{{ url_for('dashboard') }}" class="back-link">← Dashboard</a>
+
+                <p class="eyebrow">MAKE IT YOURS</p>
+
+                <h1>Settings</h1>
+
+                <p>Choose the colours and details that make Anchor Study feel like your space.</p>
+            </header>
+
+            <section class="settings-card">
+
+                <form method="POST" action="{{ url_for('settings') }}">
+
+                    <div class="theme-section">
+                        <h2>Choose your theme</h2>
+
+                        <p>Your chosen theme will be saved to your account and used throughout Anchor Study.</p>
+
+                        <div class="theme-grid">
+                            {% for theme_key, theme in themes.items() %}
+                                <label class="theme-option">
+                                    <input
+                                        type="radio"
+                                        name="theme"
+                                        value="{{ theme_key }}"
+                                        {% if (user.theme or 'anchor_classic') == theme_key %}checked{% endif %}
+                                        aria-label="{{ theme.name }}"
+                                    >
+
+                                    <div class="theme-card">
+                                        <div class="theme-swatches" aria-hidden="true">
+                                            {% for color in theme.colors %}
+                                                <span class="theme-swatch" style="background-color: {{ color }};"></span>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="theme-name">
+                                            <span>{{ theme.name }}</span>
+
+                                            {% if (user.theme or 'anchor_classic') == theme_key %}
+                                                <span class="theme-check">✓ Selected</span>
+                                            {% endif %}
+                                        </div>
+
+                                        <p class="theme-description">
+                                            {% if theme_key == 'anchor_classic' %}
+                                                Your original navy, white and gold.
+                                            {% elif theme_key == 'sage_garden' %}
+                                                Calm sage, cream and olive.
+                                            {% elif theme_key == 'lavender_haze' %}
+                                                Soft lavender with gentle purple.
+                                            {% elif theme_key == 'midnight' %}
+                                                Deep, dark and understated.
+                                            {% elif theme_key == 'rosewater' %}
+                                                Dusty pink and warm ivory.
+                                            {% elif theme_key == 'terracotta' %}
+                                                Earthy orange and sandy neutrals.
+                                            {% elif theme_key == 'ocean_breeze' %}
+                                                Refreshing teal and seafoam.
+                                            {% elif theme_key == 'forest_canopy' %}
+                                                Forest green and natural sage.
+                                            {% elif theme_key == 'burgundy_luxe' %}
+                                                Rich burgundy with muted gold.
+                                            {% elif theme_key == 'skybound' %}
+                                                Airy sky blue and soft whites.
+                                            {% elif theme_key == 'arctic_slate' %}
+                                                Cool slate and icy blue.
+                                            {% elif theme_key == 'mocha_cream' %}
+                                                Espresso, caramel and cream.
+                                            {% else %}
+                                                A fresh look for your study space.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="settings-divider"></div>
+
+                    <section class="doodle-settings">
+                        <h2>Doodle Style</h2>
+
+                        <p>Add a little personality to your study space. Choose how your decorative doodles appear.</p>
+
+                        <div class="doodle-style-options">
+
+                            <label class="doodle-style-option">
+                                <input
+                                    type="radio"
+                                    name="doodle_style"
+                                    value="off"
+                                    {% if (user.doodle_style or 'off') == 'off' %}checked{% endif %}
+                                >
+
+                                <span class="doodle-style-card">
+                                    <strong>Off</strong>
+                                    <span>Keep everything clean and simple.</span>
+                                </span>
+                            </label>
+
+                            <label class="doodle-style-option">
+                                <input
+                                    type="radio"
+                                    name="doodle_style"
+                                    value="subtle"
+                                    {% if user.doodle_style == 'subtle' %}checked{% endif %}
+                                >
+
+                                <span class="doodle-style-card">
+                                    <strong>Subtle</strong>
+                                    <span>Soft doodles in the background.</span>
+                                </span>
+                            </label>
+
+                            <label class="doodle-style-option">
+                                <input
+                                    type="radio"
+                                    name="doodle_style"
+                                    value="playful"
+                                    {% if user.doodle_style == 'playful' %}checked{% endif %}
+                                >
+
+                                <span class="doodle-style-card">
+                                    <strong>Playful</strong>
+                                    <span>More visible decorative illustrations.</span>
+                                </span>
+                            </label>
+
+                        </div>
+                    </section>
+
+                    <div class="theme-actions">
+                        <button type="submit" class="primary-button">
+                            Save Settings
+                        </button>
+
+                        <button
+                            type="submit"
+                            name="theme"
+                            value="anchor_classic"
+                            class="secondary-button"
+                        >
+                            Reset to Anchor Classic
+                        </button>
+                    </div>
+
+                </form>
+
+                <div class="settings-divider"></div>
+
+                <section class="settings-section">
+                    <div>
+                        <h2>Account information</h2>
+                        <p>Your account is currently connected to <strong>{{ user.email }}</strong>.</p>
+                    </div>
+
+                    <a href="{{ url_for('profile') }}" class="secondary-button">
+                        View Profile
+                    </a>
+                </section>
+
+                <div class="settings-divider"></div>
+
+                <section class="settings-section">
+                    <div>
+                        <h2>Session</h2>
+                        <p>Sign out of Anchor Study on this device.</p>
+                    </div>
+
+                    <a href="{{ url_for('logout') }}" class="primary-button">
+                        Log Out
+                    </a>
+                </section>
+
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const sidebar = document.getElementById('appSidebar');
+        const sidebarOpen = document.getElementById('sidebarOpen');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function openSidebar() {
+            sidebar.classList.add('mobile-menu-visible');
+            sidebarOverlay.classList.add('menu-open');
+            sidebarOpen.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('mobile-menu-visible');
+            sidebarOverlay.classList.remove('menu-open');
+            sidebarOpen.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+
+        sidebarOpen.addEventListener('click', openSidebar);
+        sidebarClose.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', closeSidebar);
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                closeSidebar();
+            }
+        });
+    </script>
+
+</body>
+</html>

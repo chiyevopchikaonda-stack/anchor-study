@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="anchor_classic" data-doodles="off">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#142b4a">
+
+    <title>Sign Up | Anchor Study</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 540px;
+            margin: auto;
+        }
+
+        .auth-brand {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .auth-brand a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-logo {
+            display: block;
+            width: 170px;
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .auth-card {
+            width: 100%;
+            padding: 38px;
+            border-radius: 22px;
+            background: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #e6e9ef);
+            box-shadow: 0 14px 40px rgba(20, 43, 74, 0.08);
+        }
+
+        .auth-header {
+            margin-bottom: 28px;
+            text-align: center;
+        }
+
+        .auth-header .eyebrow {
+            margin-bottom: 10px;
+            color: #bd923e;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .auth-header h1 {
+            margin: 0 0 12px;
+            color: var(--text-primary, #142b4a);
+            font-size: clamp(1.7rem, 4vw, 2.15rem);
+            line-height: 1.25;
+        }
+
+        .auth-header > p:last-child {
+            max-width: 360px;
+            margin: 0 auto;
+            color: var(--text-secondary, #667085);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 19px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .form-group label {
+            color: var(--text-primary, #142b4a);
+            font-size: 0.9rem;
+            font-weight: 650;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            min-height: 48px;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color, #d9dee7);
+            border-radius: 10px;
+            background: var(--input-bg, #ffffff);
+            color: var(--text-primary, #142b4a);
+            font: inherit;
+            font-size: 0.92rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-group input::placeholder {
+            color: #98a2b3;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #bd923e;
+            box-shadow: 0 0 0 3px rgba(189, 146, 62, 0.15);
+        }
+
+        .form-group small {
+            color: var(--text-secondary, #667085);
+            font-size: 0.78rem;
+            line-height: 1.5;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .primary-button.auth-button {
+            width: 100%;
+            min-height: 50px;
+            margin-top: 5px;
+            padding: 13px 18px;
+            border: none;
+            border-radius: 10px;
+            background: #142b4a;
+            color: #ffffff;
+            font: inherit;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .primary-button.auth-button:hover {
+            background: #203d63;
+            transform: translateY(-1px);
+        }
+
+        .primary-button.auth-button:focus-visible {
+            outline: 3px solid #bd923e;
+            outline-offset: 3px;
+        }
+
+        .auth-footer {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color, #e6e9ef);
+            text-align: center;
+        }
+
+        .auth-footer p {
+            margin: 0;
+            color: var(--text-secondary, #667085);
+            font-size: 0.9rem;
+        }
+
+        .auth-footer a {
+            color: #bd923e;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 520px) {
+            .auth-page {
+                padding: 24px 14px;
+                align-items: flex-start;
+            }
+
+            .auth-container {
+                max-width: 430px;
+            }
+
+            .auth-brand {
+                margin-bottom: 18px;
+            }
+
+            .auth-logo {
+                width: 145px;
+            }
+
+            .auth-card {
+                padding: 27px 21px;
+                border-radius: 17px;
+            }
+
+            .auth-header {
+                margin-bottom: 24px;
+            }
+
+            .auth-form {
+                gap: 17px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 17px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="auth-page">
+
+        <div class="auth-container">
+
+            <div class="auth-brand">
+                <a href="/" aria-label="Anchor Study home">
+                    <img
+                        src="{{ url_for('static', filename='images/anchor-study-logo.png') }}"
+                        alt="Anchor Study logo"
+                        class="auth-logo"
+                    >
+                </a>
+            </div>
+
+            <section class="auth-card" aria-labelledby="signup-heading">
+
+                <div class="auth-header">
+                    <p class="eyebrow">CREATE YOUR SPACE</p>
+
+                    <h1 id="signup-heading">Welcome to Anchor Study.</h1>
+
+                    <p>
+                        Set up your student space and start building
+                        your journey.
+                    </p>
+                </div>
+
+                <form method="POST" class="auth-form">
+
+                    <div class="form-group">
+                        <label for="full_name">Full Name</label>
+
+                        <input
+                            type="text"
+                            id="full_name"
+                            name="full_name"
+                            placeholder="Enter your full name"
+                            autocomplete="name"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Enter your email"
+                            autocomplete="email"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="university">University</label>
+
+                        <input
+                            type="text"
+                            id="university"
+                            name="university"
+                            placeholder="Enter your university"
+                            autocomplete="organization"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-row">
+
+                        <div class="form-group">
+                            <label for="course">Course</label>
+
+                            <input
+                                type="text"
+                                id="course"
+                                name="course"
+                                placeholder="Your course"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="year_of_study">Year of Study</label>
+
+                            <select
+                                id="year_of_study"
+                                name="year_of_study"
+                                required
+                            >
+                                <option value="">Select year</option>
+                                <option value="1">Year 1</option>
+                                <option value="2">Year 2</option>
+                                <option value="3">Year 3</option>
+                                <option value="4">Year 4</option>
+                                <option value="5">Year 5</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+
+                        <small>Your password must be at least 8 characters.</small>
+                    </div>
+
+                    <button type="submit" class="primary-button auth-button">
+                        Create Account
+                    </button>
+
+                </form>
+
+                <div class="auth-footer">
+                    <p>
+                        Already have an account?
+                        <a href="{{ url_for('login') }}">Sign in</a>
+                    </p>
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</body>
+</html>

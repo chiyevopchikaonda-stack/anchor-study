@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+
+<html lang="en" data-theme="{{ user.theme or 'anchor_classic' }}" data-doodles="{{ user.doodle_style or 'off' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Harbor | Anchor Study</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .timer-main {
+            flex: 1;
+            min-width: 0;
+            padding: 36px;
+            overflow: hidden;
+        }
+
+```
+    .harbor-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    .harbor-eyebrow,
+    .harbor-label {
+        display: inline-block;
+        color: #b58b36;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 1.8px;
+    }
+
+    .harbor-header h1 {
+        margin: 10px 0;
+        color: var(--text-primary, #172c4a);
+        font-size: clamp(1.8rem, 3vw, 2.6rem);
+    }
+
+    .harbor-header p {
+        max-width: 600px;
+        color: var(--text-secondary, #697586);
+        line-height: 1.7;
+    }
+
+    .harbor-marker {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        flex-shrink: 0;
+        color: #172c4a;
+    }
+
+    .harbor-marker > span {
+        display: grid;
+        place-items: center;
+        width: 62px;
+        height: 62px;
+        border-radius: 20px;
+        background: #172c4a;
+        color: #e7c16a;
+        font-size: 2rem;
+    }
+
+    .harbor-marker small {
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        line-height: 1.6;
+    }
+
+    .harbor-layout {
+        display: grid;
+        grid-template-columns: minmax(280px, 0.85fr) minmax(360px, 1.15fr);
+        gap: 24px;
+        align-items: stretch;
+    }
+
+    .harbor-side {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .anchor-setup-card,
+    .today-anchor-card,
+    .anchor-dial-card,
+    .harbor-stat,
+    .harbor-history {
+        border: 1px solid var(--border-color, #e6eaf0);
+        border-radius: 22px;
+        background: var(--card-bg, #ffffff);
+        box-shadow: 0 8px 28px rgba(23, 44, 74, 0.045);
+    }
+
+    .anchor-setup-card {
+        padding: 26px;
+    }
+
+    .setup-heading {
+        margin-bottom: 24px;
+    }
+
+    .setup-heading h2,
+    .harbor-section-heading h2 {
+        margin: 8px 0 0;
+        color: var(--text-primary, #172c4a);
+        font-size: 1.35rem;
+    }
+
+    .harbor-field {
+        margin-bottom: 20px;
+    }
+
+    .harbor-field label {
+        display: block;
+        margin-bottom: 9px;
+        color: var(--text-primary, #172c4a);
+        font-size: 0.86rem;
+        font-weight: 700;
+    }
+
+    .harbor-field input,
+    .harbor-field select {
+        width: 100%;
+        min-height: 46px;
+        padding: 12px 14px;
+        border: 1px solid var(--border-color, #dce2ea);
+        border-radius: 11px;
+        outline: none;
+        background: var(--input-bg, #ffffff);
+        color: var(--text-primary, #172c4a);
+        font: inherit;
+        box-sizing: border-box;
+    }
+
+    .harbor-field input:focus,
+    .harbor-field select:focus {
+        border-color: #b58b36;
+        box-shadow: 0 0 0 3px rgba(181, 139, 54, 0.12);
+    }
+
+    .time-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    .time-heading label {
+        margin: 0;
+    }
+
+    .time-heading > span {
+        color: #b58b36;
+        font-size: 0.82rem;
+        font-weight: 800;
+    }
+
+    .time-choices {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 7px;
+    }
+
+    .time-choice {
+        min-height: 39px;
+        padding: 8px 4px;
+        border: 1px solid var(--border-color, #dce2ea);
+        border-radius: 9px;
+        background: var(--card-bg, #ffffff);
+        color: var(--text-primary, #172c4a);
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .time-choice.selected {
+        border-color: #172c4a;
+        background: #172c4a;
+        color: #ffffff;
+    }
+
+    .time-choice:disabled,
+    .harbor-field input:disabled,
+    .harbor-field select:disabled,
+    .custom-time-area button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .custom-time-area {
+        display: none;
+        align-items: center;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    .custom-time-area.visible {
+        display: flex;
+    }
+
+    .custom-time-input {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+    }
+
+    .custom-time-input input {
+        min-width: 0;
+        width: 90px;
+    }
+
+    .custom-time-input span {
+        color: var(--text-secondary, #697586);
+        font-size: 0.82rem;
+    }
+
+    #applyCustomTime {
+        min-height: 43px;
+        padding: 0 18px;
+        border: none;
+        border-radius: 10px;
+        background: #e9d7a4;
+        color: #172c4a;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .drop-anchor-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        min-height: 52px;
+        margin-top: 6px;
+        border: none;
+        border-radius: 13px;
+        background: #172c4a;
+        color: #ffffff;
+        font-size: 0.95rem;
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform 0.2s, background 0.2s;
+    }
+
+    .drop-anchor-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        background: #243e63;
+    }
+
+    .drop-anchor-button > span {
+        color: #e9c66e;
+        font-size: 1.25rem;
+    }
+
+    .drop-anchor-button:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+
+    .today-anchor-card {
+        padding: 24px;
+        background: linear-gradient(145deg, #172c4a, #243e63);
+        color: #ffffff;
+    }
+
+    .verse-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .today-anchor-card .harbor-label {
+        color: #e9c66e;
+    }
+
+    .verse-mark {
+        color: #e9c66e;
+        font-size: 1.4rem;
+    }
+
+    .today-anchor-card blockquote {
+        margin: 20px 0 14px;
+        font-size: 1.12rem;
+        font-weight: 600;
+        line-height: 1.8;
+    }
+
+    .verse-reference {
+        color: #e9c66e;
+        font-size: 0.85rem;
+        font-weight: 800;
+    }
+
+    .verse-footer {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 22px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .verse-footer > span {
+        width: 28px;
+        height: 2px;
+        background: #e9c66e;
+    }
+
+    .verse-footer p {
+        margin: 0;
+        color: #dce4ee;
+        font-size: 0.78rem;
+    }
+
+    .anchor-dial-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-width: 0;
+        padding: 28px;
+    }
+
+    .dial-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .dial-status {
+        margin-top: 8px;
+        color: #b58b36;
+        font-size: 0.75rem;
+        font-weight: 900;
+        letter-spacing: 1.5px;
+    }
+
+    .dial-indicator {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #cbd5e1;
+    }
+
+    .dial-indicator.settled {
+        background: #8bb5a0;
+    }
+
+    .dial-indicator.deep {
+        background: #6e9ed8;
+    }
+
+    .dial-indicator.steady {
+        background: #d4b45d;
+    }
+
+    .dial-indicator.nearly-done {
+        background: #7bb68e;
+        box-shadow: 0 0 0 5px rgba(123, 182, 142, 0.14);
+    }
+
+    .dial-area {
+        position: relative;
+        display: grid;
+        place-items: center;
+        flex: 1;
+        min-height: 340px;
+        padding: 22px 0;
+    }
+
+    .anchor-dial {
+        --dial-progress: 0deg;
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: min(290px, 70vw);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: conic-gradient(#d7b45d var(--dial-progress), #e8edf3 var(--dial-progress));
+        transition: background 0.3s;
+    }
+
+    .anchor-dial::before {
+        position: absolute;
+        inset: 10px;
+        border: 1px dashed rgba(23, 44, 74, 0.2);
+        border-radius: 50%;
+        content: "";
+    }
+
+    .dial-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: calc(100% - 28px);
+        height: calc(100% - 28px);
+        border-radius: 50%;
+        background: var(--card-bg, #ffffff);
+        text-align: center;
+    }
+
+    .dial-anchor {
+        color: #b58b36;
+        font-size: 2rem;
+    }
+
+    .anchor-floating {
+        animation: anchorFloat 2.4s ease-in-out infinite;
+    }
+
+    @keyframes anchorFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+
+    .dial-time {
+        margin: 7px 0;
+        color: var(--text-primary, #172c4a);
+        font-size: clamp(2rem, 4vw, 2.8rem);
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -1px;
+    }
+
+    .dial-subject {
+        max-width: 85%;
+        overflow: hidden;
+        color: var(--text-primary, #172c4a);
+        font-size: 0.92rem;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .dial-topic {
+        max-width: 82%;
+        margin-top: 6px;
+        overflow: hidden;
+        color: var(--text-secondary, #697586);
+        font-size: 0.76rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .dial-marks {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+    }
+
+    .dial-mark {
+        position: absolute;
+        color: var(--text-secondary, #697586);
+        font-size: 0.58rem;
+        font-weight: 800;
+        letter-spacing: 0.7px;
+    }
+
+    .mark-one {
+        top: 7%;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .mark-two {
+        top: 50%;
+        right: -1%;
+        transform: translateY(-50%);
+    }
+
+    .mark-three {
+        bottom: 7%;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .mark-four {
+        top: 50%;
+        left: -2%;
+        transform: translateY(-50%);
+    }
+
+    .dial-footer {
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color, #e6eaf0);
+    }
+
+    .progress-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        color: var(--text-secondary, #697586);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.7px;
+    }
+
+    .progress-label strong {
+        color: var(--text-primary, #172c4a);
+        font-size: 0.9rem;
+    }
+
+    .harbor-progress-track {
+        height: 8px;
+        overflow: hidden;
+        border-radius: 20px;
+        background: var(--border-color, #e6eaf0);
+    }
+
+    .harbor-progress-fill {
+        width: 0;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #b58b36, #e9c66e);
+        transition: width 0.25s linear;
+    }
+
+    .dial-controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .dial-controls button {
+        flex: 1;
+        min-height: 43px;
+        border: 1px solid var(--border-color, #dce2ea);
+        border-radius: 10px;
+        background: var(--card-bg, #ffffff);
+        color: var(--text-primary, #172c4a);
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .dial-controls button:last-child {
+        border-color: #ead4d4;
+        color: #a64242;
+    }
+
+    .dial-controls button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .harbor-stats-section,
+    .recent-harbor-section {
+        margin-top: 38px;
+    }
+
+    .harbor-section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 20px;
+    }
+
+    .journey-line {
+        flex: 1;
+        max-width: 180px;
+        height: 1px;
+        background: var(--border-color, #e6eaf0);
+    }
+
+    .harbor-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .harbor-stat {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        min-width: 0;
+        padding: 20px 16px;
+    }
+
+    .stat-symbol {
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        background: #f5ecd5;
+        color: #9a7427;
+        font-size: 1.15rem;
+    }
+
+    .harbor-stat > div {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .harbor-stat > div > span {
+        color: var(--text-secondary, #697586);
+        font-size: 0.64rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+    }
+
+    .harbor-stat strong {
+        margin: 6px 0 3px;
+        color: var(--text-primary, #172c4a);
+        font-size: 1.15rem;
+        overflow-wrap: anywhere;
+    }
+
+    .harbor-stat small {
+        color: var(--text-secondary, #697586);
+        font-size: 0.72rem;
+        line-height: 1.5;
+    }
+
+    .harbor-history {
+        overflow: hidden;
+        padding: 8px 22px;
+    }
+
+    .empty-harbor {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 24px 4px;
+    }
+
+    .empty-harbor > span {
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        width: 48px;
+        height: 48px;
+        border-radius: 15px;
+        background: #f5ecd5;
+        color: #9a7427;
+        font-size: 1.5rem;
+    }
+
+    .empty-harbor strong {
+        color: var(--text-primary, #172c4a);
+    }
+
+    .empty-harbor p {
+        margin: 6px 0 0;
+        color: var(--text-secondary, #697586);
+        font-size: 0.85rem;
+        line-height: 1.6;
+    }
+
+    .harbor-history-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 17px 0;
+        border-bottom: 1px solid var(--border-color, #e6eaf0);
+    }
+
+    .harbor-history-item:last-child {
+        border-bottom: none;
+    }
+
+    .history-check {
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #e4f2e8;
+        color: #398153;
+        font-weight: 900;
+    }
+
+    .history-info {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-width: 0;
+        gap: 5px;
+    }
+
+    .history-info strong {
+        overflow: hidden;
+        color: var(--text-primary, #172c4a);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .history-info span,
+    .history-duration span {
+        color: var(--text-secondary, #697586);
+        font-size: 0.78rem;
+    }
+
+    .history-duration {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        flex-shrink: 0;
+        gap: 5px;
+    }
+
+    .history-duration strong {
+        color: var(--text-primary, #172c4a);
+        font-size: 0.9rem;
+    }
+
+    .harbor-complete-overlay {
+        position: fixed;
+        z-index: 2000;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(13, 28, 48, 0.72);
+        backdrop-filter: blur(5px);
+    }
+
+    .harbor-complete-overlay.visible {
+        display: flex;
+    }
+
+    .harbor-complete-card {
+        width: 100%;
+        max-width: 440px;
+        padding: 34px;
+        border: 1px solid rgba(233, 198, 110, 0.35);
+        border-radius: 25px;
+        background: var(--card-bg, #ffffff);
+        text-align: center;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+        animation: completionAppear 0.25s ease-out;
+    }
+
+    @keyframes completionAppear {
+        from { opacity: 0; transform: translateY(12px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .complete-anchor {
+        display: grid;
+        place-items: center;
+        width: 66px;
+        height: 66px;
+        margin: 0 auto 18px;
+        border-radius: 22px;
+        background: #172c4a;
+        color: #e9c66e;
+        font-size: 2rem;
+    }
+
+    .harbor-complete-card h2 {
+        margin: 12px 0;
+        color: var(--text-primary, #172c4a);
+        font-size: 1.7rem;
+    }
+
+    .harbor-complete-card > p {
+        color: var(--text-secondary, #697586);
+        line-height: 1.7;
+    }
+
+    .complete-main-stat {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin: 24px 0;
+        padding: 20px;
+        border-radius: 15px;
+        background: var(--page-bg, #f6f8fb);
+    }
+
+    .complete-main-stat strong {
+        color: var(--text-primary, #172c4a);
+        font-size: 2rem;
+    }
+
+    .complete-main-stat span,
+    .complete-details span {
+        color: var(--text-secondary, #697586);
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+    }
+
+    .complete-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 24px;
+        text-align: left;
+    }
+
+    .complete-details > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .complete-details strong {
+        color: var(--text-primary, #172c4a);
+        font-size: 0.88rem;
+        overflow-wrap: anywhere;
+    }
+
+    #closeCompletionButton {
+        width: 100%;
+        min-height: 49px;
+        border: none;
+        border-radius: 12px;
+        background: #172c4a;
+        color: #ffffff;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    @media (max-width: 1200px) {
+        .timer-main {
+            padding: 28px;
+        }
+
+        .harbor-layout {
+            grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 1.1fr);
+            gap: 18px;
+        }
+
+        .harbor-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 900px) {
+        .timer-main {
+            padding: 24px;
+        }
+
+        .harbor-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .harbor-side {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: start;
+        }
+
+        .anchor-dial-card {
+            min-height: 520px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .timer-main {
+            padding: 20px 15px 30px;
+        }
+
+        .harbor-header {
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .harbor-header h1 {
+            font-size: 1.7rem;
+        }
+
+        .harbor-header p {
+            font-size: 0.88rem;
+        }
+
+        .harbor-marker {
+            display: none;
+        }
+
+        .harbor-side {
+            display: flex;
+        }
+
+        .anchor-setup-card,
+        .today-anchor-card,
+        .anchor-dial-card {
+            padding: 21px;
+            border-radius: 18px;
+        }
+
+        .time-choices {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 5px;
+        }
+
+        .time-choice {
+            font-size: 0.72rem;
+        }
+
+        .anchor-dial-card {
+            min-height: 0;
+        }
+
+        .dial-area {
+            min-height: 310px;
+        }
+
+        .anchor-dial {
+            width: min(270px, 76vw);
+        }
+
+        .dial-mark {
+            font-size: 0.5rem;
+        }
+
+        .mark-two {
+            right: -3%;
+        }
+
+        .mark-four {
+            left: -4%;
+        }
+
+        .harbor-stats {
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .harbor-stat {
+            gap: 9px;
+            padding: 15px 11px;
+        }
+
+        .stat-symbol {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        .harbor-stat > div > span {
+            font-size: 0.57rem;
+        }
+
+        .harbor-stat strong {
+            font-size: 1rem;
+        }
+
+        .harbor-stat small {
+            font-size: 0.67rem;
+        }
+
+        .harbor-section-heading h2 {
+            font-size: 1.15rem;
+        }
+
+        .journey-line {
+            display: none;
+        }
+
+        .harbor-history {
+            padding: 6px 14px;
+        }
+
+        .history-info strong {
+            font-size: 0.85rem;
+        }
+
+        .history-duration strong {
+            font-size: 0.8rem;
+        }
+
+        .harbor-complete-card {
+            padding: 26px 21px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .anchor-floating,
+        .harbor-complete-card {
+            animation: none;
+        }
+
+        *,
+        *::before,
+        *::after {
+            scroll-behavior: auto !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+</style>
+```
+
+</head>
+<body>
+
+<div class="app-layout">
+
+```
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <a href="{{ url_for('dashboard') }}" aria-label="Anchor Study dashboard">
+            <img src="{{ url_for('static', filename='images/anchor-study-logo.png') }}" alt="Anchor Study">
+        </a>
+        <div class="sidebar-brand-text">
+            <strong>Anchor Study</strong>
+            <small>Stay focused. Stay grounded.</small>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="sidebar-section">
+            <p>WORKSPACE</p>
+            <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+                <span>⌂</span><span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('study') }}" class="sidebar-link">
+                <span>▤</span><span>Study Planner</span>
+            </a>
+            <a href="{{ url_for('timer') }}" class="sidebar-link active" aria-current="page">
+                <span>◷</span><span>Focus Timer</span>
+            </a>
+            <a href="{{ url_for('tasks') }}" class="sidebar-link">
+                <span>✓</span><span>Tasks</span>
+            </a>
+            <a href="{{ url_for('notes') }}" class="sidebar-link">
+                <span>▧</span><span>Notes</span>
+            </a>
+            <a href="{{ url_for('goals') }}" class="sidebar-link">
+                <span>◎</span><span>Goals</span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <p>PERSONAL SPACE</p>
+            <a href="{{ url_for('scripture') }}" class="sidebar-link">
+                <span>✧</span><span>My Scriptures</span>
+            </a>
+            <a href="{{ url_for('prayer_journal') }}" class="sidebar-link">
+                <span>♡</span><span>Prayer Journal</span>
+            </a>
+            <a href="{{ url_for('devotionals') }}" class="sidebar-link">
+                <span>☼</span><span>Devotionals</span>
+            </a>
+            <a href="{{ url_for('reflections') }}" class="sidebar-link">
+                <span>✎</span><span>Reflections</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('profile') }}" class="sidebar-link">
+            <span>♙</span><span>Profile</span>
+        </a>
+        <a href="{{ url_for('settings') }}" class="sidebar-link">
+            <span>⚙</span><span>Settings</span>
+        </a>
+        <a href="{{ url_for('logout') }}" class="sidebar-link logout-link">
+            <span>↪</span><span>Log Out</span>
+        </a>
+    </div>
+</aside>
+
+<div class="mobile-header">
+    <button class="mobile-menu-button" id="mobileMenuButton" type="button" aria-label="Open navigation" aria-expanded="false">
+        ☰
+    </button>
+    <span>⚓ Anchor Study</span>
+</div>
+
+<div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+<main class="timer-main">
+
+    <div class="harbor-header">
+        <div>
+            <span class="harbor-eyebrow">STUDY HARBOR</span>
+            <h1>Drop anchor. Find your focus.</h1>
+            <p>Create a quiet space for your mind to settle and your work to move forward.</p>
+        </div>
+        <div class="harbor-marker">
+            <span>⚓</span>
+            <small>FOCUS<br>ZONE</small>
+        </div>
+    </div>
+
+    <section class="harbor-layout">
+
+        <div class="harbor-side">
+
+            <div class="anchor-setup-card">
+                <div class="setup-heading">
+                    <span class="harbor-label">PREPARE YOUR SESSION</span>
+                    <h2>Where are you headed?</h2>
+                </div>
+
+                {% if study_plans %}
+                <div class="harbor-field">
+                    <label for="plannedSession">Study Planner</label>
+                    <select id="plannedSession">
+                        <option value="">Choose a planned session</option>
+                        {% for plan in study_plans %}
+                        <option value="{{ plan.id }}" data-subject="{{ plan.subject.name }}" data-topic="{{ plan.topic }}">
+                            {{ plan.subject.name }} · {{ plan.topic }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                <div class="harbor-field">
+                    <label for="timerSubject">Subject</label>
+                    <select id="timerSubject">
+                        <option value="">Select a subject</option>
+                        {% for subject in subjects %}
+                        <option value="{{ subject.name }}">
+                            {% if subject.code %}{{ subject.code }} · {% endif %}{{ subject.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="harbor-field">
+                    <label for="timerTopic">What are you working on?</label>
+                    <input type="text" id="timerTopic" placeholder="e.g. CIA Triad" maxlength="100">
+                </div>
+
+                <div class="harbor-field">
+                    <div class="time-heading">
+                        <label>How long are you staying?</label>
+                        <span id="selectedTimeLabel">25 minutes</span>
+                    </div>
+                    <div class="time-choices">
+                        <button type="button" class="time-choice" data-minutes="15">15m</button>
+                        <button type="button" class="time-choice selected" data-minutes="25">25m</button>
+                        <button type="button" class="time-choice" data-minutes="45">45m</button>
+                        <button type="button" class="time-choice" data-minutes="60">60m</button>
+                        <button type="button" class="time-choice custom-time-choice" id="customTimeButton" aria-expanded="false">Custom</button>
+                    </div>
+                    <div class="custom-time-area" id="customTimeArea">
+                        <div class="custom-time-input">
+                            <input type="number" id="customMinutes" min="1" max="720" placeholder="37" aria-label="Custom timer duration in minutes">
+                            <span>minutes</span>
+                        </div>
+                        <button type="button" id="applyCustomTime">Set</button>
+                    </div>
+                </div>
+
+                <button type="button" class="drop-anchor-button" id="dropAnchorButton">
+                    <span>⚓</span> Drop Anchor
+                </button>
+            </div>
+
+            <div class="today-anchor-card">
+                <div class="verse-top">
+                    <span class="harbor-label">TODAY'S ANCHOR</span>
+                    <span class="verse-mark">✦</span>
+                </div>
+                <blockquote id="verseText">“Commit your work to the Lord, and your plans will be established.”</blockquote>
+                <div class="verse-reference">Proverbs 16:3</div>
+                <div class="verse-footer">
+                    <span></span>
+                    <p>A focused mind. A grounded heart.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="anchor-dial-card">
+            <div class="dial-header">
+                <div>
+                    <span class="harbor-label">YOUR ANCHOR DIAL</span>
+                    <div class="dial-status" id="dialStatus" role="status" aria-live="polite">HARBOR READY</div>
+                </div>
+                <div class="dial-indicator" id="dialIndicator"></div>
+            </div>
+
+            <div class="dial-area">
+                <div class="dial-marks" aria-hidden="true">
+                    <span class="dial-mark mark-one">SETTLED</span>
+                    <span class="dial-mark mark-two">IN THE DEEP</span>
+                    <span class="dial-mark mark-three">STEADY</span>
+                    <span class="dial-mark mark-four">NEARING SHORE</span>
+                </div>
+
+                <div class="anchor-dial" id="anchorDial">
+                    <div class="dial-inner">
+                        <div class="dial-anchor" id="dialAnchor">⚓</div>
+                        <div class="dial-time" id="timerDisplay" role="timer" aria-live="off">25:00</div>
+                        <div class="dial-subject" id="currentSubject">Choose your subject</div>
+                        <div class="dial-topic" id="currentTopic">Your study topic will appear here</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dial-footer">
+                <div class="dial-progress">
+                    <div class="progress-label">
+                        <span>SESSION PROGRESS</span>
+                        <strong id="progressPercentage">0%</strong>
+                    </div>
+                    <div class="harbor-progress-track" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="voyageProgressTrack">
+                        <div class="harbor-progress-fill" id="voyageProgressFill"></div>
+                    </div>
+                </div>
+                <div class="dial-controls">
+                    <button type="button" id="pauseButton" disabled>Pause</button>
+                    <button type="button" id="endButton" disabled>Leave Harbor</button>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="harbor-stats-section">
+        <div class="harbor-section-heading">
+            <div>
+                <span class="harbor-label">YOUR JOURNEY</span>
+                <h2>Every focused minute counts.</h2>
+            </div>
+            <div class="journey-line"></div>
+        </div>
+
+        <div class="harbor-stats">
+            <div class="harbor-stat">
+                <span class="stat-symbol">⚓</span>
+                <div>
+                    <span>FOCUS LEVEL</span>
+                    <strong id="focusLevel">Level 1</strong>
+                    <small id="focusLevelName">Getting Started</small>
+                </div>
+            </div>
+            <div class="harbor-stat">
+                <span class="stat-symbol">◷</span>
+                <div>
+                    <span>TOTAL FOCUS</span>
+                    <strong id="totalFocus">0 min</strong>
+                    <small>Time you've invested</small>
+                </div>
+            </div>
+            <div class="harbor-stat">
+                <span class="stat-symbol">✦</span>
+                <div>
+                    <span>SESSIONS COMPLETED</span>
+                    <strong id="sessionsCompleted">0</strong>
+                    <small>Voyages finished</small>
+                </div>
+            </div>
+            <div class="harbor-stat">
+                <span class="stat-symbol">★</span>
+                <div>
+                    <span>PERSONAL BEST</span>
+                    <strong id="personalBest">0 min</strong>
+                    <small>Longest focused session</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="recent-harbor-section">
+        <div class="harbor-section-heading">
+            <div>
+                <span class="harbor-label">RECENT VOYAGES</span>
+                <h2>Sessions you've completed.</h2>
+            </div>
+        </div>
+        <div class="harbor-history" id="recentVoyagesList">
+            <div class="empty-harbor">
+                <span>⚓</span>
+                <div>
+                    <strong>Your first voyage is waiting.</strong>
+                    <p>Complete a focused session and your history will appear here.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+```
+
+</div>
+
+<div class="harbor-complete-overlay" id="completionOverlay" role="dialog" aria-modal="true" aria-labelledby="completionTitle" aria-describedby="completionMessage">
+    <div class="harbor-complete-card">
+        <div class="complete-anchor">⚓</div>
+        <span class="harbor-label">ANCHOR SECURED</span>
+        <h2 id="completionTitle">You reached the shore.</h2>
+        <p id="completionMessage">Your focused study session is complete.</p>
+        <div class="complete-main-stat">
+            <strong id="completionMinutes">25 min</strong>
+            <span>FOCUSED</span>
+        </div>
+        <div class="complete-details">
+            <div>
+                <span>SUBJECT</span>
+                <strong id="completionSubject">Study</strong>
+            </div>
+            <div>
+                <span>REWARD</span>
+                <strong id="focusPoints">+25 Focus Minutes</strong>
+            </div>
+        </div>
+        <button type="button" id="closeCompletionButton">Return to Harbor</button>
+    </div>
+</div>
+
+<script>
+const timerDisplay = document.getElementById("timerDisplay");
+const anchorDial = document.getElementById("anchorDial");
+const dialAnchor = document.getElementById("dialAnchor");
+const dialStatus = document.getElementById("dialStatus");
+const dialIndicator = document.getElementById("dialIndicator");
+const timerSubject = document.getElementById("timerSubject");
+const timerTopic = document.getElementById("timerTopic");
+const plannedSession = document.getElementById("plannedSession");
+const selectedTimeLabel = document.getElementById("selectedTimeLabel");
+const timeChoices = document.querySelectorAll(".time-choice");
+const customTimeButton = document.getElementById("customTimeButton");
+const customTimeArea = document.getElementById("customTimeArea");
+const customMinutes = document.getElementById("customMinutes");
+const applyCustomTime = document.getElementById("applyCustomTime");
+const dropAnchorButton = document.getElementById("dropAnchorButton");
+const pauseButton = document.getElementById("pauseButton");
+const endButton = document.getElementById("endButton");
+const voyageProgressFill = document.getElementById("voyageProgressFill");
+const voyageProgressTrack = document.getElementById("voyageProgressTrack");
+const progressPercentage = document.getElementById("progressPercentage");
+const focusLevel = document.getElementById("focusLevel");
+const focusLevelName = document.getElementById("focusLevelName");
+const totalFocus = document.getElementById("totalFocus");
+const sessionsCompleted = document.getElementById("sessionsCompleted");
+const personalBest = document.getElementById("personalBest");
+const recentVoyagesList = document.getElementById("recentVoyagesList");
+const completionOverlay = document.getElementById("completionOverlay");
+const completionMinutes = document.getElementById("completionMinutes");
+const completionSubject = document.getElementById("completionSubject");
+const completionMessage = document.getElementById("completionMessage");
+const focusPoints = document.getElementById("focusPoints");
+const closeCompletionButton = document.getElementById("closeCompletionButton");
+
+const STORAGE_KEY = "anchorStudyFocusVoyage";
+const ACTIVE_TIMER_KEY = "anchorStudyActiveTimer";
+
+let selectedMinutes = 25;
+let totalSeconds = 25 * 60;
+let remainingSeconds = totalSeconds;
+let timerInterval = null;
+let isRunning = false;
+let isPaused = false;
+let activeTimer = null;
+let audioContext = null;
+
+const defaultData = {
+    totalSeconds: 0,
+    completedSessions: 0,
+    bestMinutes: 0,
+    recentVoyages: []
+};
+
+function getStoredData() {
+    try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (!stored) return { ...defaultData };
+        const parsed = JSON.parse(stored);
+        return {
+            ...defaultData,
+            ...parsed,
+            recentVoyages: Array.isArray(parsed.recentVoyages) ? parsed.recentVoyages : []
+        };
+    } catch {
+        return { ...defaultData };
+    }
+}
+
+function saveStoredData(data) {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch {
+        dialStatus.textContent = "STORAGE UNAVAILABLE";
+    }
+}
+
+function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remaining = seconds % 60;
+    if (hours > 0) {
+        return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(remaining).padStart(2, "0")}`;
+    }
+    return `${String(minutes).padStart(2, "0")}:${String(remaining).padStart(2, "0")}`;
+}
+
+function formatMinutes(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return remainingMinutes === 0 ? `${hours} hr` : `${hours} hr ${remainingMinutes} min`;
+}
+
+function getLevel(totalMinutes) {
+    if (totalMinutes >= 600) return { level: "Level 5", name: "Steady Navigator" };
+    if (totalMinutes >= 360) return { level: "Level 4", name: "Deep Focus" };
+    if (totalMinutes >= 180) return { level: "Level 3", name: "Staying the Course" };
+    if (totalMinutes >= 60) return { level: "Level 2", name: "Finding Your Rhythm" };
+    return { level: "Level 1", name: "Getting Started" };
+}
+
+function updateJourneyStats() {
+    const data = getStoredData();
+    const level = getLevel(Math.floor(data.totalSeconds / 60));
+    focusLevel.textContent = level.level;
+    focusLevelName.textContent = level.name;
+    totalFocus.textContent = formatMinutes(data.totalSeconds);
+    sessionsCompleted.textContent = data.completedSessions;
+    personalBest.textContent = `${data.bestMinutes} min`;
+    renderRecentVoyages(data.recentVoyages);
+}
+
+function renderRecentVoyages(voyages) {
+    if (!voyages || voyages.length === 0) {
+        recentVoyagesList.innerHTML = `
+            <div class="empty-harbor">
+                <span>⚓</span>
+                <div>
+                    <strong>Your first voyage is waiting.</strong>
+                    <p>Complete a focused session and your history will appear here.</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    recentVoyagesList.innerHTML = voyages.map(voyage => `
+        <div class="harbor-history-item">
+            <div class="history-check">✓</div>
+            <div class="history-info">
+                <strong>${escapeHtml(voyage.topic)}</strong>
+                <span>${escapeHtml(voyage.subject)}</span>
+            </div>
+            <div class="history-duration">
+                <strong>${Number(voyage.minutes) || 0} min</strong>
+                <span>${escapeHtml(voyage.date)}</span>
+            </div>
+        </div>
+    `).join("");
+}
+
+function escapeHtml(value) {
+    const element = document.createElement("div");
+    element.textContent = String(value ?? "");
+    return element.innerHTML;
+}
+
+function updateCurrentDetails() {
+    document.getElementById("currentSubject").textContent = timerSubject.value || "Choose your subject";
+    document.getElementById("currentTopic").textContent = timerTopic.value.trim() || "Your study topic will appear here";
+}
+
+function selectTime(minutes) {
+    if (isRunning) return;
+    selectedMinutes = minutes;
+    totalSeconds = minutes * 60;
+    remainingSeconds = totalSeconds;
+    selectedTimeLabel.textContent = minutes === 1 ? "1 minute" : `${minutes} minutes`;
+
+    timeChoices.forEach(button => {
+        button.classList.toggle("selected", Number(button.dataset.minutes) === minutes);
+    });
+
+    customTimeArea.classList.remove("visible");
+    customTimeButton.setAttribute("aria-expanded", "false");
+    updateTimerDisplay();
+}
+
+timeChoices.forEach(button => {
+    button.addEventListener("click", () => {
+        if (button === customTimeButton) {
+            const isVisible = customTimeArea.classList.toggle("visible");
+            customTimeButton.setAttribute("aria-expanded", String(isVisible));
+            timeChoices.forEach(item => item.classList.remove("selected"));
+            if (isVisible) customMinutes.focus();
+            return;
+        }
+        selectTime(Number(button.dataset.minutes));
+    });
+});
+
+applyCustomTime.addEventListener("click", () => {
+    const minutes = Number(customMinutes.value);
+    if (!Number.isInteger(minutes) || minutes < 1 || minutes > 720) {
+        customMinutes.setCustomValidity("Enter a whole number between 1 and 720.");
+        customMinutes.reportValidity();
+        customMinutes.focus();
+        return;
+    }
+
+    customMinutes.setCustomValidity("");
+    selectTime(minutes);
+    customTimeButton.classList.add("selected");
+});
+
+customMinutes.addEventListener("input", () => customMinutes.setCustomValidity(""));
+
+customMinutes.addEventListener("keydown", event => {
+    if (event.key === "Enter") applyCustomTime.click();
+});
+
+if (plannedSession) {
+    plannedSession.addEventListener("change", () => {
+        const option = plannedSession.options[plannedSession.selectedIndex];
+        if (!option.value) return;
+        timerSubject.value = option.dataset.subject || "";
+        timerTopic.value = option.dataset.topic || "";
+        updateCurrentDetails();
+    });
+}
+
+timerSubject.addEventListener("change", updateCurrentDetails);
+timerTopic.addEventListener("input", updateCurrentDetails);
+
+function updateTimerDisplay() {
+    timerDisplay.textContent = formatTime(remainingSeconds);
+    const progress = totalSeconds > 0 ? ((totalSeconds - remainingSeconds) / totalSeconds) * 100 : 0;
+    voyageProgressFill.style.width = `${progress}%`;
+    progressPercentage.textContent = `${Math.round(progress)}%`;
+    voyageProgressTrack.setAttribute("aria-valuenow", String(Math.round(progress)));
+    anchorDial.style.setProperty("--dial-progress", `${progress * 3.6}deg`);
+    updateDialState(progress);
+}
+
+function updateDialState(progress) {
+    if (!isRunning && progress === 0) {
+        dialStatus.textContent = "HARBOR READY";
+        dialIndicator.className = "dial-indicator";
+        return;
+    }
+    if (progress >= 90) {
+        dialStatus.textContent = "NEARING SHORE";
+        dialIndicator.className = "dial-indicator nearly-done";
+        return;
+    }
+    if (progress >= 60) {
+        dialStatus.textContent = "STEADY";
+        dialIndicator.className = "dial-indicator steady";
+        return;
+    }
+    if (progress >= 25) {
+        dialStatus.textContent = "IN THE DEEP";
+        dialIndicator.className = "dial-indicator deep";
+        return;
+    }
+    dialStatus.textContent = "SETTLED";
+    dialIndicator.className = "dial-indicator settled";
+}
+
+function lockSetup() {
+    timerSubject.disabled = true;
+    timerTopic.disabled = true;
+    if (plannedSession) plannedSession.disabled = true;
+    timeChoices.forEach(button => button.disabled = true);
+    customMinutes.disabled = true;
+    applyCustomTime.disabled = true;
+}
+
+function unlockSetup() {
+    timerSubject.disabled = false;
+    timerTopic.disabled = false;
+    if (plannedSession) plannedSession.disabled = false;
+    timeChoices.forEach(button => button.disabled = false);
+    customMinutes.disabled = false;
+    applyCustomTime.disabled = false;
+}
+
+function saveActiveTimer() {
+    try {
+        if (!activeTimer) {
+            localStorage.removeItem(ACTIVE_TIMER_KEY);
+            return;
+        }
+        localStorage.setItem(ACTIVE_TIMER_KEY, JSON.stringify(activeTimer));
+    } catch {
+        dialStatus.textContent = "TIMER SAVE UNAVAILABLE";
+    }
+}
+
+function removeActiveTimer() {
+    activeTimer = null;
+    try {
+        localStorage.removeItem(ACTIVE_TIMER_KEY);
+    } catch {
+        return;
+    }
+}
+
+function prepareAudio() {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    if (!audioContext) audioContext = new AudioContextClass();
+    if (audioContext.state === "suspended") {
+        audioContext.resume().catch(() => {});
+    }
+}
+
+function playCompletionSound() {
+    if (!audioContext) return;
+
+    try {
+        if (audioContext.state === "suspended") {
+            audioContext.resume().catch(() => {});
+        }
+
+        const startTime = audioContext.currentTime;
+        for (let i = 0; i < 4; i++) {
+            const oscillator = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            const beepStart = startTime + (i * 0.65);
+
+            oscillator.type = "sine";
+            oscillator.frequency.value = i % 2 === 0 ? 880 : 659.25;
+            gain.gain.setValueAtTime(0, beepStart);
+            gain.gain.linearRampToValueAtTime(0.3, beepStart + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.001, beepStart + 0.45);
+            oscillator.connect(gain);
+            gain.connect(audioContext.destination);
+            oscillator.start(beepStart);
+            oscillator.stop(beepStart + 0.45);
+        }
+    } catch {
+        return;
+    }
+}
+
+function startVoyage() {
+    updateCurrentDetails();
+
+    if (!timerSubject.value) {
+        timerSubject.focus();
+        dialStatus.textContent = "CHOOSE A SUBJECT";
+        return;
+    }
+
+    if (!timerTopic.value.trim()) {
+        timerTopic.focus();
+        dialStatus.textContent = "CHOOSE A TOPIC";
+        return;
+    }
+
+    prepareAudio();
+    isRunning = true;
+    isPaused = false;
+
+    activeTimer = {
+        durationSeconds: totalSeconds,
+        endTime: Date.now() + totalSeconds * 1000,
+        subject: timerSubject.value,
+        topic: timerTopic.value.trim(),
+        startedAt: Date.now()
+    };
+
+    saveActiveTimer();
+    lockSetup();
+    dropAnchorButton.disabled = true;
+    dropAnchorButton.innerHTML = "<span>⚓</span> Anchored";
+    pauseButton.disabled = false;
+    endButton.disabled = false;
+    anchorDial.classList.add("dial-active");
+    dialAnchor.classList.add("anchor-floating");
+
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(tick, 250);
+    tick();
+}
+
+function tick() {
+    if (!isRunning || isPaused || !activeTimer) return;
+
+    remainingSeconds = Math.max(Math.ceil((activeTimer.endTime - Date.now()) / 1000), 0);
+    updateTimerDisplay();
+
+    if (remainingSeconds <= 0) completeVoyage();
+}
+
+function pauseVoyage() {
+    if (!isRunning || !activeTimer) return;
+
+    if (!isPaused) {
+        tick();
+        if (!isRunning || !activeTimer) return;
+
+        remainingSeconds = Math.max(Math.ceil((activeTimer.endTime - Date.now()) / 1000), 0);
+        activeTimer.remainingSeconds = remainingSeconds;
+        isPaused = true;
+        activeTimer.paused = true;
+        clearInterval(timerInterval);
+        timerInterval = null;
+        pauseButton.textContent = "Resume";
+        dialStatus.textContent = "ANCHOR AT REST";
+        dialAnchor.classList.remove("anchor-floating");
+        anchorDial.classList.remove("dial-active");
+        saveActiveTimer();
+        return;
+    }
+
+    activeTimer.endTime = Date.now() + activeTimer.remainingSeconds * 1000;
+    delete activeTimer.remainingSeconds;
+    activeTimer.paused = false;
+    isPaused = false;
+    pauseButton.textContent = "Pause";
+    dialAnchor.classList.add("anchor-floating");
+    anchorDial.classList.add("dial-active");
+    saveActiveTimer();
+    timerInterval = setInterval(tick, 250);
+    tick();
+}
+
+function endVoyage() {
+    if (!isRunning || !activeTimer) return;
+
+    tick();
+    if (!isRunning || !activeTimer) return;
+
+    const elapsedSeconds = Math.max(0, totalSeconds - remainingSeconds);
+    if (elapsedSeconds >= 60) saveEarlySession(elapsedSeconds);
+    removeActiveTimer();
+    resetTimer();
+}
+
+function saveEarlySession(seconds) {
+    const data = getStoredData();
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 1) return;
+
+    data.totalSeconds += seconds;
+    if (minutes > data.bestMinutes) data.bestMinutes = minutes;
+
+    data.recentVoyages.unshift({
+        subject: activeTimer ? activeTimer.subject : timerSubject.value,
+        topic: activeTimer ? activeTimer.topic : timerTopic.value.trim(),
+        minutes: minutes,
+        date: new Date().toLocaleDateString()
+    });
+
+    data.recentVoyages = data.recentVoyages.slice(0, 5);
+    saveStoredData(data);
+    updateJourneyStats();
+}
+
+function completeVoyage() {
+    if (!activeTimer) return;
+
+    clearInterval(timerInterval);
+    timerInterval = null;
+    isRunning = false;
+    isPaused = false;
+
+    const completedMinutes = Math.round(activeTimer.durationSeconds / 60);
+    const subject = activeTimer.subject;
+    const topic = activeTimer.topic;
+    const data = getStoredData();
+
+    data.totalSeconds += activeTimer.durationSeconds;
+    data.completedSessions += 1;
+    if (completedMinutes > data.bestMinutes) data.bestMinutes = completedMinutes;
+
+    data.recentVoyages.unshift({
+        subject: subject,
+        topic: topic,
+        minutes: completedMinutes,
+        date: new Date().toLocaleDateString()
+    });
+
+    data.recentVoyages = data.recentVoyages.slice(0, 5);
+    saveStoredData(data);
+    removeActiveTimer();
+
+    remainingSeconds = 0;
+    updateTimerDisplay();
+    dialStatus.textContent = "ANCHORED";
+    dialAnchor.classList.remove("anchor-floating");
+    anchorDial.classList.remove("dial-active");
+    anchorDial.classList.add("dial-complete");
+    pauseButton.disabled = true;
+    endButton.disabled = true;
+
+    completionMinutes.textContent = `${completedMinutes} min`;
+    completionSubject.textContent = subject;
+    focusPoints.textContent = `+${completedMinutes} Focus Minutes`;
+    completionMessage.textContent = `You gave ${completedMinutes} minutes of focused attention to ${topic}.`;
+
+    updateJourneyStats();
+    completionOverlay.classList.add("visible");
+    closeCompletionButton.focus();
+    playCompletionSound();
+
+    if (navigator.vibrate) navigator.vibrate([150, 100, 150]);
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    removeActiveTimer();
+
+    isRunning = false;
+    isPaused = false;
+    selectedMinutes = 25;
+    totalSeconds = 25 * 60;
+    remainingSeconds = totalSeconds;
+
+    unlockSetup();
+    dropAnchorButton.disabled = false;
+    dropAnchorButton.innerHTML = "<span>⚓</span> Drop Anchor";
+    pauseButton.disabled = true;
+    pauseButton.textContent = "Pause";
+    endButton.disabled = true;
+
+    anchorDial.classList.remove("dial-active", "dial-complete");
+    dialAnchor.classList.remove("anchor-floating");
+
+    timeChoices.forEach(button => {
+        button.classList.toggle("selected", button.dataset.minutes === "25");
+    });
+
+    customTimeArea.classList.remove("visible");
+    customTimeButton.setAttribute("aria-expanded", "false");
+    selectedTimeLabel.textContent = "25 minutes";
+    customMinutes.value = "";
+    updateTimerDisplay();
+}
+
+function restoreActiveTimer() {
+    let storedTimer;
+
+    try {
+        storedTimer = localStorage.getItem(ACTIVE_TIMER_KEY);
+    } catch {
+        return;
+    }
+
+    if (!storedTimer) return;
+
+    try {
+        activeTimer = JSON.parse(storedTimer);
+    } catch {
+        removeActiveTimer();
+        return;
+    }
+
+    if (!activeTimer || !activeTimer.durationSeconds || !activeTimer.subject || !activeTimer.topic) {
+        removeActiveTimer();
+        return;
+    }
+
+    totalSeconds = activeTimer.durationSeconds;
+    selectedMinutes = totalSeconds / 60;
+
+    remainingSeconds = activeTimer.paused
+        ? Math.max(Number(activeTimer.remainingSeconds) || 0, 0)
+        : Math.max(Math.ceil((activeTimer.endTime - Date.now()) / 1000), 0);
+
+    timerSubject.value = activeTimer.subject || "";
+    timerTopic.value = activeTimer.topic || "";
+    updateCurrentDetails();
+
+    isRunning = true;
+    isPaused = activeTimer.paused === true;
+    lockSetup();
+
+    dropAnchorButton.disabled = true;
+    dropAnchorButton.innerHTML = "<span>⚓</span> Anchored";
+    pauseButton.disabled = false;
+    endButton.disabled = false;
+
+    if (isPaused) {
+        pauseButton.textContent = "Resume";
+        dialStatus.textContent = "ANCHOR AT REST";
+        updateTimerDisplay();
+        return;
+    }
+
+    if (activeTimer.endTime <= Date.now()) {
+        completeVoyage();
+        return;
+    }
+
+    pauseButton.textContent = "Pause";
+    anchorDial.classList.add("dial-active");
+    dialAnchor.classList.add("anchor-floating");
+    updateTimerDisplay();
+    timerInterval = setInterval(tick, 250);
+    tick();
+}
+
+closeCompletionButton.addEventListener("click", () => {
+    completionOverlay.classList.remove("visible");
+    resetTimer();
+});
+
+completionOverlay.addEventListener("click", event => {
+    if (event.target === completionOverlay) {
+        completionOverlay.classList.remove("visible");
+        resetTimer();
+    }
+});
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && completionOverlay.classList.contains("visible")) {
+        completionOverlay.classList.remove("visible");
+        resetTimer();
+    }
+});
+
+dropAnchorButton.addEventListener("click", startVoyage);
+pauseButton.addEventListener("click", pauseVoyage);
+endButton.addEventListener("click", endVoyage);
+
+document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && activeTimer && !isPaused) tick();
+});
+
+window.addEventListener("focus", () => {
+    if (activeTimer && !isPaused) tick();
+});
+
+window.addEventListener("storage", event => {
+    if (event.key !== ACTIVE_TIMER_KEY) return;
+
+    if (!event.newValue) {
+        if (activeTimer) resetTimer();
+        return;
+    }
+
+    try {
+        const updatedTimer = JSON.parse(event.newValue);
+        if (!updatedTimer) return;
+        activeTimer = updatedTimer;
+        clearInterval(timerInterval);
+        timerInterval = null;
+        restoreActiveTimer();
+    } catch {
+        return;
+    }
+});
+
+updateCurrentDetails();
+updateTimerDisplay();
+updateJourneyStats();
+restoreActiveTimer();
+
+const mobileMenuButton = document.getElementById("mobileMenuButton");
+const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
+const sidebar = document.getElementById("sidebar");
+
+function closeMobileMenu() {
+    sidebar.classList.remove("mobile-menu-open");
+    mobileMenuOverlay.classList.remove("mobile-menu-visible");
+    document.body.classList.remove("menu-open");
+    mobileMenuButton.setAttribute("aria-expanded", "false");
+}
+
+if (mobileMenuButton && sidebar && mobileMenuOverlay) {
+    mobileMenuButton.addEventListener("click", () => {
+        sidebar.classList.add("mobile-menu-open");
+        mobileMenuOverlay.classList.add("mobile-menu-visible");
+        document.body.classList.add("menu-open");
+        mobileMenuButton.setAttribute("aria-expanded", "true");
+    });
+
+    mobileMenuOverlay.addEventListener("click", closeMobileMenu);
+
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") closeMobileMenu();
+    });
+
+    sidebar.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", closeMobileMenu);
+    });
+}
+</script>
+
+</body>
+</html>

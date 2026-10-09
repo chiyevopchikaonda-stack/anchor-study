@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reflections | Anchor Study</title>
+
+    <style>
+        :root {
+            --navy: #102746;
+            --navy-light: #193858;
+            --gold: #d8b66a;
+            --cream: #f8f6f0;
+            --white: #ffffff;
+            --text: #253449;
+            --muted: #7d8795;
+            --border: #e8e7e1;
+            --green: #617d69;
+            --sage: #edf2e9;
+            --paper: #fffefa;
+            --danger: #a34d4d;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: var(--cream);
+            color: var(--text);
+        }
+
+        button, input, textarea, select {
+            font: inherit;
+        }
+
+        button, a {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .sidebar {
+            width: 245px;
+            position: fixed;
+            inset: 0 auto 0 0;
+            background: var(--navy);
+            color: var(--white);
+            padding: 28px 18px;
+            overflow-y: auto;
+            z-index: 30;
+            transition: transform 0.25s ease;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 8px 28px;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: var(--gold);
+            color: var(--navy);
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .brand-name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .brand-caption {
+            color: #c2ccda;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .nav-label {
+            margin: 28px 10px 12px;
+            color: #aebbd0;
+            font-size: 10px;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 13px;
+            margin-bottom: 5px;
+            color: #dbe2ec;
+            border-radius: 9px;
+            font-size: 13px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .sidebar-link.active {
+            background: var(--gold);
+            color: var(--navy);
+            font-weight: 700;
+        }
+
+        .sidebar-link span:first-child {
+            width: 20px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        .main-content {
+            margin-left: 245px;
+            padding: 35px 42px 70px;
+            max-width: 1700px;
+        }
+
+        .mobile-topbar,
+        .sidebar-overlay {
+            display: none;
+        }
+
+        .mobile-topbar {
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .menu-button {
+            border: 1px solid var(--border);
+            background: var(--white);
+            color: var(--navy);
+            border-radius: 8px;
+            padding: 10px 13px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .eyebrow {
+            color: var(--green);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .page-title {
+            margin: 10px 0 12px;
+            color: var(--navy);
+            font-family: Georgia, serif;
+            font-size: clamp(34px, 4vw, 49px);
+            font-weight: 400;
+            letter-spacing: -1.5px;
+        }
+
+        .page-subtitle {
+            max-width: 570px;
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.9;
+        }
+
+        .date-label {
+            flex-shrink: 0;
+            white-space: nowrap;
+            color: var(--navy);
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 11px 16px;
+            font-size: 12px;
+        }
+
+        .welcome-panel {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+            overflow: hidden;
+            background: #efe9db;
+            border: 1px solid #e6decb;
+            border-radius: 16px;
+            padding: 32px 35px;
+            margin-bottom: 24px;
+        }
+
+        .welcome-copy {
+            max-width: 660px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-panel .eyebrow {
+            color: #68775d;
+        }
+
+        .welcome-panel h2 {
+            margin: 12px 0;
+            color: var(--navy);
+            font-family: Georgia, serif;
+            font-size: clamp(25px, 3vw, 34px);
+            font-weight: 400;
+            line-height: 1.3;
+        }
+
+        .welcome-panel p {
+            max-width: 590px;
+            color: #62695f;
+            font-size: 13px;
+            line-height: 1.9;
+            margin: 0;
+        }
+
+        .welcome-art {
+            flex-shrink: 0;
+            width: 125px;
+            height: 125px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(16,39,70,0.13);
+            border-radius: 50%;
+            color: var(--navy);
+            font-size: 58px;
+            background: rgba(255,255,255,0.35);
+            transform: rotate(-8deg);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 15px;
+            margin-bottom: 36px;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(16,39,70,0.04);
+        }
+
+        .stat-symbol {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: #f3eddf;
+            color: #9a7a35;
+            font-size: 20px;
+        }
+
+        .stat-card:nth-child(2) .stat-symbol {
+            background: var(--sage);
+            color: var(--green);
+        }
+
+        .stat-card:nth-child(3) .stat-symbol {
+            background: #edf0f6;
+            color: var(--navy);
+        }
+
+        .stat-number {
+            color: var(--navy);
+            font-family: Georgia, serif;
+            font-size: 27px;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        .section-heading {
+            color: var(--navy);
+            font-family: Georgia, serif;
+            font-size: 25px;
+            font-weight: 400;
+            margin: 0 0 8px;
+        }
+
+        .section-description {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.8;
+            margin: 0 0 20px;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(0, 1.65fr) minmax(250px, 0.8fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .panel {
+            min-width: 0;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .journal-panel {
+            padding: 29px;
+            border-top: 3px solid var(--gold);
+        }
+
+        .journal-heading {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .journal-symbol {
+            width: 43px;
+            height: 43px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: #f3eddf;
+            color: #927338;
+            font-size: 21px;
+        }
+
+        .daily-prompt {
+            padding: 17px 18px;
+            margin: 20px 0 23px;
+            background: #f8f6f0;
+            border-left: 3px solid var(--gold);
+            border-radius: 0 10px 10px 0;
+        }
+
+        .daily-prompt-label {
+            color: var(--green);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .daily-prompt p {
+            color: var(--navy);
+            font-family: Georgia, serif;
+            font-size: 17px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .field-label {
+            display: block;
+            margin: 18px 0 8px;
+            color: var(--navy);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .text-input,
+        .text-area,
+        .filter-control {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: var(--paper);
+            padding: 13px 14px;
+            color: var(--text);
+            outline: none;
+        }
+
+        .text-input:focus,
+        .text-area:focus,
+        .filter-control:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(216,182,106,0.13);
+        }
+
+        .text-area {
+            min-height: 180px;
+            resize: vertical;
+            line-height: 1.9;
+            font-size: 13px;
+        }
+
+        .reflection-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .word-hint {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 12px 17px;
+            font-size: 12px;
+            font-weight: 700;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .button:hover {
+            transform: translateY(-1px);
+        }
+
+        .primary-button {
+            background: var(--navy);
+            color: var(--white);
+        }
+
+        .primary-button:hover {
+            background: var(--navy-light);
+        }
+
+        .secondary-button {
+            background: var(--white);
+            border-color: var(--border);
+            color: var(--navy);
+        }
+
+        .secondary-button:hover {
+            background: var(--cream);
+        }
+
+        .text-button {
+            border: 0;
+            background: transparent;
+            color: var(--green);
+            padding: 8px 0;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .side-stack {
+            display: grid;
+            gap: 18px;
+        }
+
+        .gratitude-panel {
+            background: var(--sage);
+            border: 1px solid #dce5d7;
+            border-radius: 15px;
+            padding: 23px;
+        }
+
+        .side-icon {
+            width: 39px;
+            height: 39px;
+            display: grid;
+            place-items: center;
+            border-radius: 11px;
+            background: rgba(255,255,255,0.65);
+            color: var(--green);
+            font-size: 19px;
+            margin-bottom: 16px;
+        }
+
+        .gratitude-panel h3,
+        .scripture-panel h3,
+        .prompt-panel h3 {
+            margin: 0 0 9px;
+            color: var(--navy);
+            font-family: Georgia, serif;
+            font-size: 22px;
+            font-weight: 400;
+        }
+
+        .gratitude-panel p,
+        .scripture-panel p {
+            color: #657266;
+            font-size: 12px;
+            line-height: 1.8;
+            margin: 0 0 14px;
+        }
+
+        .gratitude-panel .text-area {
+            min-height: 90px;
+            background: rgba(255,255,255,0.75);
+            border-color: #d7e0d1;
+        }
+
+        .gratitude-panel .text-input {
+            background: rgba(255,255,255,0.75);
+            border-color: #d7e0d1;
+        }
+
+        .gratitude-panel .field-label {
+            color: #405847;
+        }
+
+        .gratitude-panel .primary-button {
+            margin-top: 13px;
+            width: 100%;
+            background: var(--green);
+        }
+
+        .gratitude-panel .primary-button:hover {
+            background: #4d6855;
+        }
+
+        .scripture-panel {
+            position: relative;
+            overflow: hidden;
+            padding: 24px;
+            border-radius: 15px;
+            background: var(--navy);
+            color: var(--white);
+        }
+
+        .scripture-panel::after {
+            content: "“";
+            position: absolute;
+            right: 13px;
+            top: -20px;
+            color: rgba(216,182,106,0.18);
+            font-family: Georgia, serif;
+            font-size: 120px;
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        .scripture-panel .eyebrow {
+            position: relative;
+            z-index: 1;
+            color: var(--gold);
+        }
+
+        .scripture-panel h3 {
+            position: relative;
+            z-index: 1;
+            color: var(--white);
+            margin-top: 14px;
+        }
+
+        .scripture-panel p {
+            position: relative;
+            z-index: 1;
+            color: #d4deea;
+            font-family: Georgia, serif;
+            font-size: 14px;
+            line-height: 1.9;
+        }
+
+        .verse-reference {
+            position: relative;
+            z-index: 1;
+            color: var(--gold);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .prompt-panel {
+            padding: 23px;
+        }
+
+        .prompt-list {
+            display: grid;
+            gap: 9px;
+        }
+
+        .prompt-button {
+            width: 100%;
+            text-align: left;
+            background: var(--paper);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 13px;
+            transition: border-color 0.2s, transform 0.2s, background 0.2s;
+        }
+
+        .prompt-button:hover {
+            border-color: var(--gold);
+            background: #fffdf6;
+            transform: translateY(-1px);
+        }
+
+        .prompt-category {
+            display: block;
+            color: var(--green);
+            text-transform: uppercase;
+            font-size: 9px;
+            letter-spacing: 1.1px;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .prompt-question {
+            display: block;
+            color: var(--navy);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .looking-glass {
+            margin-top: 38px;
+        }
+
+        .looking-glass-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .glass-card {
+            position: relative;
+            overflow: hidden;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 22px;
+        }
+
+        .glass-number {
+            color: var(--gold);
+            font-family: Georgia, serif;
+            font-size: 28px;
+            margin-bottom: 14px;
+        }
+
+        .glass-card h3 {
+            color: var(--navy);
+            font-size: 11px;
+            letter-spacing: 1px;
+            margin: 0 0 10px;
+        }
+
+        .glass-card p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .entries-section {
+            margin-top: 45px;
+            scroll-margin-top: 25px;
+        }
+
+        .entries-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .entry-count {
+            display: inline-block;
+            border-radius: 30px;
+            background: #e8ede5;
+            color: var(--green);
+            padding: 8px 12px;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .filter-bar {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 190px;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .filter-control {
+            background: var(--white);
+            font-size: 12px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 27px;
+        }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 7px;
+            top: 8px;
+            bottom: 8px;
+            width: 1px;
+            background: #d9c99e;
+        }
+
+        .timeline-month {
+            position: relative;
+            margin: 28px 0 16px;
+            color: var(--green);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+        }
+
+        .timeline-month:first-child {
+            margin-top: 0;
+        }
+
+        .timeline-month::before {
+            content: "";
+            position: absolute;
+            left: -25px;
+            top: 2px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--gold);
+            border: 2px solid var(--cream);
+        }
+
+        .entry-card {
+            position: relative;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 22px;
+            margin-bottom: 14px;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        .entry-card:hover {
+            box-shadow: 0 8px 24px rgba(16,39,70,0.045);
+        }
+
+        .entry-card::before {
+            content: "";
+            position: absolute;
+            left: -25px;
+            top: 25px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            border: 2px solid var(--cream);
+        }
+
+        .entry-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+            color: var(--muted);
+            font-size: 10px;
+            margin-bottom: 12px;
+        }
+
+        .entry-tag {
+            display: inline-block;
+            border-radius: 20px;
+            padding: 5px 8px;
+            background: #edf2e9;
+            color: var(--green);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .entry-title {
+            color: var(--navy);
+            font-family: Georgia, serif;
+            font-size: 22px;
+            line-height: 1.4;
+            font-weight: 400;
+            margin: 0 0 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .entry-prompt {
+            color: var(--green);
+            font-size: 11px;
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+
+        .entry-content {
+            color: #536073;
+            font-size: 13px;
+            line-height: 1.9;
+            margin: 0;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .entry-content.collapsed {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 4;
+            overflow: hidden;
+        }
+
+        .entry-actions {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid #f0efe9;
+        }
+
+        .entry-action {
+            border: 0;
+            padding: 4px 0;
+            background: transparent;
+            color: var(--green);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .entry-action:hover {
+            text-decoration: underline;
+        }
+
+        .entry-action.delete {
+            color: var(--danger);
+        }
+
+        .edit-form {
+            display: none;
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px solid var(--border);
+        }
+
+        .edit-form.open {
+            display: block;
+        }
+
+        .edit-actions {
+            display: flex;
+            gap: 9px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .empty-state {
+            padding: 42px 25px;
+            background: var(--white);
+            border: 1px dashed #d9d9cf;
+            border-radius: 14px;
+            text-align: center;
+        }
+
+        .empty-symbol {
+            color: var(--gold);
+            font-size: 38px;
+        }
+
+        .empty-state h3 {
+            font-family: Georgia, serif;
+            color: var(--navy);
+            font-size: 24px;
+            font-weight: 400;
+            margin: 13px 0 8px;
+        }
+
+        .empty-state p {
+            max-width: 410px;
+            margin: 0 auto 18px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.9;
+        }
+
+        .no-results {
+            display: none;
+            text-align: center;
+            padding: 25px;
+            color: var(--muted);
+            font-size: 12px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .closing-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 42px;
+            padding: 24px;
+            border-top: 1px solid #e5e0d4;
+            text-align: center;
+        }
+
+        .closing-note span {
+            color: var(--gold);
+            font-size: 22px;
+        }
+
+        .closing-note p {
+            color: var(--muted);
+            font-family: Georgia, serif;
+            font-size: 14px;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .closing-note strong {
+            color: var(--navy);
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        @media (min-width: 1450px) {
+            .main-content {
+                padding-right: 55px;
+                padding-left: 55px;
+            }
+        }
+
+        @media (max-width: 1150px) {
+            .main-content {
+                padding: 30px 25px 55px;
+            }
+
+            .workspace {
+                grid-template-columns: minmax(0, 1.3fr) minmax(230px, 0.85fr);
+                gap: 16px;
+            }
+
+            .journal-panel {
+                padding: 22px;
+            }
+
+            .panel {
+                padding: 21px;
+            }
+
+            .welcome-art {
+                width: 95px;
+                height: 95px;
+                font-size: 45px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.visible {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background: rgba(9,20,35,0.48);
+                z-index: 25;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px 25px 45px;
+            }
+
+            .mobile-topbar {
+                display: flex;
+            }
+
+            .workspace {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .side-stack {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                align-items: start;
+            }
+
+            .prompt-panel {
+                grid-column: 1 / -1;
+            }
+
+            .welcome-panel {
+                padding: 27px;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .main-content {
+                padding: 17px 15px 35px;
+            }
+
+            .page-header {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .page-title {
+                font-size: 37px;
+            }
+
+            .welcome-panel {
+                padding: 23px 21px;
+            }
+
+            .welcome-art {
+                display: none;
+            }
+
+            .stats-grid {
+                gap: 9px;
+            }
+
+            .stat-card {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 10px;
+                padding: 14px;
+            }
+
+            .stat-symbol {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+
+            .stat-number {
+                font-size: 24px;
+            }
+
+            .stat-label {
+                line-height: 1.5;
+            }
+
+            .journal-panel,
+            .panel {
+                padding: 19px;
+            }
+
+            .side-stack {
+                grid-template-columns: 1fr;
+            }
+
+            .prompt-panel {
+                grid-column: auto;
+            }
+
+            .looking-glass-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .glass-card {
+                padding: 19px;
+            }
+
+            .glass-number {
+                margin-bottom: 8px;
+            }
+
+            .entries-header {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .filter-bar {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline {
+                padding-left: 22px;
+            }
+
+            .timeline-month::before {
+                left: -20px;
+            }
+
+            .entry-card::before {
+                left: -20px;
+            }
+
+            .entry-card {
+                padding: 18px;
+            }
+
+            .entry-title {
+                font-size: 20px;
+            }
+
+            .reflection-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .reflection-actions .button {
+                width: 100%;
+            }
+
+            .closing-note {
+                padding: 20px 5px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *, *::before, *::after {
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <div class="brand-mark">⚓</div>
+            <div>
+                <div class="brand-name">Anchor Study</div>
+                <div class="brand-caption">Stay focused. Stay grounded.</div>
+            </div>
+        </div>
+
+        <div class="nav-label">Workspace</div>
+        <a href="{{ url_for('dashboard') }}" class="sidebar-link"><span>⌂</span><span>Dashboard</span></a>
+        <a href="{{ url_for('study') }}" class="sidebar-link"><span>▤</span><span>Study Planner</span></a>
+        <a href="{{ url_for('timer') }}" class="sidebar-link"><span>◷</span><span>Focus Timer</span></a>
+        <a href="{{ url_for('tasks') }}" class="sidebar-link"><span>✓</span><span>Tasks</span></a>
+        <a href="{{ url_for('notes') }}" class="sidebar-link"><span>▧</span><span>Notes</span></a>
+        <a href="{{ url_for('goals') }}" class="sidebar-link"><span>◎</span><span>Goals</span></a>
+
+        <div class="nav-label">Personal space</div>
+        <a href="{{ url_for('scripture') }}" class="sidebar-link"><span>✧</span><span>My Scriptures</span></a>
+        <a href="{{ url_for('prayer_journal') }}" class="sidebar-link"><span>♡</span><span>Prayer Journal</span></a>
+        <a href="{{ url_for('devotionals') }}" class="sidebar-link"><span>✦</span><span>Devotionals</span></a>
+        <a href="{{ url_for('reflections') }}" class="sidebar-link active"><span>❋</span><span>Reflections</span></a>
+
+        <div class="nav-label">Account</div>
+        <a href="{{ url_for('profile') }}" class="sidebar-link"><span>◉</span><span>Profile</span></a>
+        <a href="{{ url_for('settings') }}" class="sidebar-link"><span>⚙</span><span>Settings</span></a>
+        <a href="{{ url_for('logout') }}" class="sidebar-link"><span>↪</span><span>Log out</span></a>
+    </aside>
+
+    <main class="main-content">
+        <div class="mobile-topbar">
+            <strong>⚓ Anchor Study</strong>
+            <button class="menu-button" type="button" onclick="toggleSidebar()" aria-label="Open navigation menu">☰ Menu</button>
+        </div>
+
+        <header class="page-header">
+            <div>
+                <div class="eyebrow">Reflections · Your personal space</div>
+                <h1 class="page-title">Becoming, one day at a time.</h1>
+                <p class="page-subtitle">A place to pause, make sense of your experiences, celebrate small victories and notice the person you're becoming.</p>
+            </div>
+            <div class="date-label" id="currentDate"></div>
+        </header>
+
+        <section class="welcome-panel">
+            <div class="welcome-copy">
+                <div class="eyebrow">A gentle reminder</div>
+                <h2>You don't have to have it all figured out.</h2>
+                <p>Some days bring progress. Others bring questions. Give yourself room to understand what you've experienced, recognise what you're learning and choose your next step.</p>
+            </div>
+            <div class="welcome-art" aria-hidden="true">✧</div>
+        </section>
+
+        <section class="stats-grid" aria-label="Reflection statistics">
+            <article class="stat-card">
+                <div class="stat-symbol">▤</div>
+                <div>
+                    <div class="stat-number">{{ reflections|length }}</div>
+                    <div class="stat-label">Entries written</div>
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-symbol">◷</div>
+                <div>
+                    <div class="stat-number" id="daysReflected">0</div>
+                    <div class="stat-label">Days reflected</div>
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-symbol">✧</div>
+                <div>
+                    <div class="stat-number" id="monthReflections">0</div>
+                    <div class="stat-label">Entries this month</div>
+                </div>
+            </article>
+        </section>
+
+        <section class="workspace" id="write">
+            <div class="panel journal-panel">
+                <div class="journal-heading">
+                    <div>
+                        <div class="eyebrow">Make room for your thoughts</div>
+                        <h2 class="section-heading" style="margin-top: 9px;">Today's reflection</h2>
+                        <p class="section-description">It doesn't have to sound perfect. It just has to be honest.</p>
+                    </div>
+                    <div class="journal-symbol" aria-hidden="true">✎</div>
+                </div>
+
+                <div class="daily-prompt">
+                    <div class="daily-prompt-label">Today's question</div>
+                    <p id="dailyQuestion">What did today teach you about yourself?</p>
+                    <button class="text-button" type="button" id="useDailyPrompt">Use this question ↗</button>
+                </div>
+
+                <form method="POST" action="{{ url_for('save_reflection') }}" id="reflectionForm">
+                    <label class="field-label" for="title">Give this moment a title</label>
+                    <input class="text-input" type="text" id="title" name="title" maxlength="200" placeholder="e.g. Learning to be patient with myself" required>
+
+                    <label class="field-label" for="prompt">Reflection prompt</label>
+                    <input class="text-input" type="text" id="prompt" name="prompt" maxlength="300" placeholder="Choose a question or write your own">
+
+                    <label class="field-label" for="content">Your thoughts</label>
+                    <textarea class="text-area" id="content" name="content" placeholder="Today, I've been thinking about..." required></textarea>
+
+                    <div class="reflection-actions">
+                        <span class="word-hint" id="wordCount">0 words · Take your time.</span>
+                        <button class="button primary-button" type="submit">Save reflection ↗</button>
+                    </div>
+                </form>
+            </div>
+
+            <aside class="side-stack">
+                <section class="gratitude-panel">
+                    <div class="side-icon" aria-hidden="true">♡</div>
+                    <div class="eyebrow">Find the little good</div>
+                    <h3>A small win today</h3>
+                    <p>Not every good thing needs to be a big thing. What went right today, or what are you thankful for?</p>
+
+                    <form method="POST" action="{{ url_for('save_reflection') }}" id="gratitudeForm">
+                        <input type="hidden" name="title" value="A little good today">
+                        <input type="hidden" name="prompt" value="Gratitude: What went right today, or what am I thankful for?">
+
+                        <label class="field-label" for="gratitudeContent">One thing I'm grateful for...</label>
+                        <textarea class="text-area" id="gratitudeContent" name="content" maxlength="10000" placeholder="Today, I'm thankful for..." required></textarea>
+
+                        <button class="button primary-button" type="submit">Save this moment ♡</button>
+                    </form>
+                </section>
+
+                <section class="scripture-panel">
+                    <div class="eyebrow">A thought to carry</div>
+                    <h3>Make room to grow.</h3>
+                    <p>"And be not conformed to this world: but be ye transformed by the renewing of your mind."</p>
+                    <div class="verse-reference">ROMANS 12:2 · KJV</div>
+                </section>
+
+                <section class="panel prompt-panel">
+                    <div class="eyebrow">A little direction</div>
+                    <h3 style="margin-top: 9px;">Start with a question.</h3>
+                    <p class="section-description">Choose a prompt to bring it into your journal.</p>
+
+                    <div class="prompt-list">
+                        {% for item in prompts %}
+                        <button class="prompt-button" type="button" data-prompt="{{ item.question }}" data-category="{{ item.category }}">
+                            <span class="prompt-category">{{ item.category }}</span>
+                            <span class="prompt-question">{{ item.question }}</span>
+                        </button>
+                        {% endfor %}
+                    </div>
+                </section>
+            </aside>
+        </section>
+
+        <section class="looking-glass">
+            <div class="eyebrow">A simple practice</div>
+            <h2 class="section-heading" style="margin-top: 9px;">The Looking Glass</h2>
+            <p class="section-description">When you don't know where to start, try looking at an experience from three different angles.</p>
+
+            <div class="looking-glass-grid">
+                <article class="glass-card">
+                    <div class="glass-number">01</div>
+                    <h3>LOOK BACK</h3>
+                    <p>What happened? What challenged, surprised or encouraged me?</p>
+                </article>
+
+                <article class="glass-card">
+                    <div class="glass-number">02</div>
+                    <h3>LOOK INWARD</h3>
+                    <p>What did I learn about myself? What would I handle differently?</p>
+                </article>
+
+                <article class="glass-card">
+                    <div class="glass-number">03</div>
+                    <h3>LOOK FORWARD</h3>
+                    <p>What lesson or small action do I want to carry into tomorrow?</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="entries-section" id="archive">
+            <div class="entries-header">
+                <div>
+                    <div class="eyebrow">Your story so far</div>
+                    <h2 class="section-heading" style="margin-top: 9px;">Pages from your journey</h2>
+                    <p class="section-description" style="margin-bottom: 0;">Little pieces of your life, kept for another day.</p>
+                </div>
+                <span class="entry-count">{{ reflections|length }} entr{% if reflections|length == 1 %}y{% else %}ies{% endif %}</span>
+            </div>
+
+            {% if reflections %}
+            <div class="filter-bar">
+                <input class="filter-control" type="search" id="searchEntries" placeholder="Search titles, thoughts or prompts..." aria-label="Search reflections">
+
+                <select class="filter-control" id="categoryFilter" aria-label="Filter reflections by category">
+                    <option value="all">All reflections</option>
+                    <option value="personal growth">Personal growth</option>
+                    <option value="student life">Student life</option>
+                    <option value="gratitude">Gratitude</option>
+                    <option value="faith">Faith</option>
+                    <option value="looking forward">Looking forward</option>
+                    <option value="other">Other reflections</option>
+                </select>
+            </div>
+
+            <div class="timeline" id="timeline">
+                {% set ns = namespace(current_month='') %}
+
+                {% for entry in reflections %}
+                    {% set entry_month = entry.created_at.strftime('%B %Y') %}
+
+                    {% if entry_month != ns.current_month %}
+                        {% set ns.current_month = entry_month %}
+                        <div class="timeline-month" data-month="{{ entry_month }}">{{ entry_month }}</div>
+                    {% endif %}
+
+                    <article class="entry-card"
+                        data-title="{{ entry.title|lower }}"
+                        data-content="{{ entry.content|lower }}"
+                        data-prompt="{{ (entry.prompt or '')|lower }}"
+                        data-category="{% if entry.prompt and 'gratitude' in entry.prompt|lower or 'grateful' in entry.title|lower or 'small win' in entry.title|lower %}gratitude{% elif entry.prompt and 'faith' in entry.prompt|lower or entry.prompt and 'god' in entry.prompt|lower %}faith{% elif entry.prompt and 'student' in entry.prompt|lower or entry.prompt and 'studies' in entry.prompt|lower %}student life{% elif entry.prompt and 'tomorrow' in entry.prompt|lower or entry.prompt and 'differently' in entry.prompt|lower %}looking forward{% elif entry.prompt %}personal growth{% else %}other{% endif %}">
+
+                        <div class="entry-meta">
+                            <span>{{ entry.created_at.strftime('%d %B %Y · %H:%M') }}</span>
+                            <span class="entry-tag">
+                                {% if entry.prompt and 'gratitude' in entry.prompt|lower or 'grateful' in entry.title|lower or 'small win' in entry.title|lower %}
+                                    Gratitude
+                                {% elif entry.prompt and 'faith' in entry.prompt|lower or entry.prompt and 'god' in entry.prompt|lower %}
+                                    Faith
+                                {% elif entry.prompt and 'student' in entry.prompt|lower or entry.prompt and 'studies' in entry.prompt|lower %}
+                                    Student life
+                                {% elif entry.prompt and 'tomorrow' in entry.prompt|lower or entry.prompt and 'differently' in entry.prompt|lower %}
+                                    Looking forward
+                                {% elif entry.prompt %}
+                                    Personal growth
+                                {% else %}
+                                    Personal reflection
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <h3 class="entry-title">{{ entry.title }}</h3>
+
+                        {% if entry.prompt %}
+                        <div class="entry-prompt">{{ entry.prompt }}</div>
+                        {% endif %}
+
+                        <p class="entry-content collapsed">{{ entry.content }}</p>
+
+                        {% if entry.content|length > 240 %}
+                        <button type="button" class="text-button read-toggle">Read full reflection ↓</button>
+                        {% endif %}
+
+                        {% if entry.updated_at and entry.updated_at > entry.created_at %}
+                        <div class="entry-meta" style="margin-top: 12px; margin-bottom: 0;">Last updated {{ entry.updated_at.strftime('%d %B %Y') }}</div>
+                        {% endif %}
+
+                        <div class="entry-actions">
+                            <button type="button" class="entry-action edit-toggle">Edit reflection</button>
+
+                            <form method="POST" action="{{ url_for('delete_reflection', reflection_id=entry.id) }}" onsubmit="return confirm('Delete this reflection permanently? This cannot be undone.');">
+                                <button type="submit" class="entry-action delete">Delete</button>
+                            </form>
+                        </div>
+
+                        <form method="POST" action="{{ url_for('edit_reflection', reflection_id=entry.id) }}" class="edit-form">
+                            <label class="field-label" for="edit-title-{{ entry.id }}">Title</label>
+                            <input class="text-input" type="text" id="edit-title-{{ entry.id }}" name="title" maxlength="200" value="{{ entry.title }}" required>
+
+                            <label class="field-label" for="edit-prompt-{{ entry.id }}">Prompt</label>
+                            <input class="text-input" type="text" id="edit-prompt-{{ entry.id }}" name="prompt" maxlength="300" value="{{ entry.prompt or '' }}">
+
+                            <label class="field-label" for="edit-content-{{ entry.id }}">Your reflection</label>
+                            <textarea class="text-area" id="edit-content-{{ entry.id }}" name="content" required>{{ entry.content }}</textarea>
+
+                            <div class="edit-actions">
+                                <button type="submit" class="button primary-button">Save changes</button>
+                                <button type="button" class="button secondary-button cancel-edit">Cancel</button>
+                            </div>
+                        </form>
+                    </article>
+                {% endfor %}
+            </div>
+
+            <div class="no-results" id="noResults">No reflections match that search. Try a different word or category.</div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-symbol">✧</div>
+                <h3>Your first page is waiting.</h3>
+                <p>There is no right way to begin. Write down one thing you've learned, something you're working through or a moment you want to remember.</p>
+                <a class="button primary-button" href="#write">Write your first reflection ↗</a>
+            </div>
+            {% endif %}
+        </section>
+
+        <footer class="closing-note">
+            <span aria-hidden="true">✧</span>
+            <p>Growth doesn't always make noise.<br><strong>Give yourself room to become.</strong></p>
+            <span aria-hidden="true">✧</span>
+        </footer>
+    </main>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("open");
+            document.getElementById("sidebarOverlay").classList.toggle("visible");
+        }
+
+        const today = new Date();
+
+        document.getElementById("currentDate").textContent =
+            new Intl.DateTimeFormat("en", {
+                weekday: "short",
+                day: "numeric",
+                month: "short",
+                year: "numeric"
+            }).format(today);
+
+        const dailyQuestions = [
+            "What did today teach you about yourself?",
+            "What is one small thing you handled better than you would have before?",
+            "Where did you find encouragement today?",
+            "What has been taking up space in your mind lately?",
+            "What is one thing you are grateful for in this season?",
+            "What would you like to leave behind before tomorrow begins?",
+            "What is something you are learning to be patient with?",
+            "Where did you notice God's faithfulness today?",
+            "What is one thing you want to do differently tomorrow?",
+            "What small step forward are you proud of?"
+        ];
+
+        const dayIndex = Math.floor(
+            new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime() / 86400000
+        ) % dailyQuestions.length;
+
+        const dailyQuestion = dailyQuestions[dayIndex];
+
+        document.getElementById("dailyQuestion").textContent = dailyQuestion;
+
+        document.getElementById("useDailyPrompt").addEventListener("click", () => {
+            document.getElementById("prompt").value = dailyQuestion;
+            document.getElementById("prompt").focus();
+            document.getElementById("write").scrollIntoView({ behavior: "smooth" });
+        });
+
+        document.querySelectorAll(".prompt-button").forEach(button => {
+            button.addEventListener("click", () => {
+                document.getElementById("prompt").value = button.dataset.prompt;
+                document.getElementById("prompt").focus();
+                document.getElementById("write").scrollIntoView({ behavior: "smooth" });
+            });
+        });
+
+        const contentArea = document.getElementById("content");
+        const wordCount = document.getElementById("wordCount");
+
+        contentArea.addEventListener("input", () => {
+            const text = contentArea.value.trim();
+            const count = text ? text.split(/\s+/).length : 0;
+            wordCount.textContent = `${count} word${count === 1 ? "" : "s"} · Take your time.`;
+        });
+
+        const searchInput = document.getElementById("searchEntries");
+        const categoryFilter = document.getElementById("categoryFilter");
+        const entryCards = Array.from(document.querySelectorAll(".entry-card"));
+        const noResults = document.getElementById("noResults");
+
+        function filterEntries() {
+            if (!searchInput || !categoryFilter) {
+                return;
+            }
+
+            const search = searchInput.value.trim().toLowerCase();
+            const category = categoryFilter.value;
+            let visibleCount = 0;
+
+            entryCards.forEach(card => {
+                const searchableText = [
+                    card.dataset.title,
+                    card.dataset.content,
+                    card.dataset.prompt
+                ].join(" ");
+
+                const matchesSearch = searchableText.includes(search);
+                const matchesCategory = category === "all" || card.dataset.category === category;
+                const visible = matchesSearch && matchesCategory;
+
+                card.style.display = visible ? "" : "none";
+
+                if (visible) {
+                    visibleCount++;
+                }
+            });
+
+            document.querySelectorAll(".timeline-month").forEach(month => {
+                let next = month.nextElementSibling;
+                let hasVisibleEntry = false;
+
+                while (next && !next.classList.contains("timeline-month")) {
+                    if (next.classList.contains("entry-card") && next.style.display !== "none") {
+                        hasVisibleEntry = true;
+                        break;
+                    }
+                    next = next.nextElementSibling;
+                }
+
+                month.style.display = hasVisibleEntry ? "" : "none";
+            });
+
+            noResults.style.display = visibleCount === 0 ? "block" : "none";
+        }
+
+        if (searchInput && categoryFilter) {
+            searchInput.addEventListener("input", filterEntries);
+            categoryFilter.addEventListener("change", filterEntries);
+        }
+
+        document.querySelectorAll(".edit-toggle").forEach(button => {
+            button.addEventListener("click", () => {
+                const card = button.closest(".entry-card");
+                const form = card.querySelector(".edit-form");
+                const isOpen = form.classList.toggle("open");
+
+                button.textContent = isOpen ? "Close editor" : "Edit reflection";
+
+                if (isOpen) {
+                    form.querySelector("input[name='title']").focus();
+                }
+            });
+        });
+
+        document.querySelectorAll(".cancel-edit").forEach(button => {
+            button.addEventListener("click", () => {
+                const form = button.closest(".edit-form");
+                const card = button.closest(".entry-card");
+                form.classList.remove("open");
+                card.querySelector(".edit-toggle").textContent = "Edit reflection";
+            });
+        });
+
+        document.querySelectorAll(".read-toggle").forEach(button => {
+            button.addEventListener("click", () => {
+                const card = button.closest(".entry-card");
+                const content = card.querySelector(".entry-content");
+                const expanded = content.classList.toggle("collapsed");
+
+                button.textContent = expanded ? "Read full reflection ↓" : "Show less ↑";
+            });
+        });
+
+        const reflectionDates = {{ reflections|map(attribute='created_at')|map('string')|list|tojson }};
+
+        const uniqueDays = new Set(
+            reflectionDates.map(value => value.slice(0, 10))
+        );
+
+        const currentMonth = today.getMonth();
+        const currentYear = today.getFullYear();
+
+        const thisMonthCount = reflectionDates.filter(value => {
+            const entryDate = new Date(value);
+            return entryDate.getMonth() === currentMonth &&
+                entryDate.getFullYear() === currentYear;
+        }).length;
+
+        document.getElementById("daysReflected").textContent = uniqueDays.size;
+        document.getElementById("monthReflections").textContent = thisMonthCount;
+    </script>
+</body>
+</html>
