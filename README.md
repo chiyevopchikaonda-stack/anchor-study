@@ -4,7 +4,7 @@
 
 Anchor Study is a student companion designed to help students stay organised, build consistent study habits and keep their academic goals in sight. Built with a Christian foundation, it brings academic productivity and personal reflection together in one place.
 
-## ✨ Features
+## Features
 
 * **Dashboard:** A central place to access your study activities.
 * **Study Planner:** Organise your academic work and study sessions.
@@ -20,7 +20,7 @@ Anchor Study is a student companion designed to help students stay organised, bu
 
 *Features may evolve as development continues.*
 
-## 🛠️ Built With
+## Built With
 
 * Python
 * Flask
@@ -30,7 +30,7 @@ Anchor Study is a student companion designed to help students stay organised, bu
 * CSS
 * JavaScript
 
-## 🚀 Getting Started
+## Getting Started
 
 Follow these steps to run Anchor Study locally.
 
@@ -92,7 +92,7 @@ If you're using Windows Command Prompt instead of PowerShell, activate the virtu
 venv\Scripts\activate.bat
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 anchor-study/
@@ -110,17 +110,17 @@ anchor-study/
 
 The exact files and folders may vary as the project develops. Local environment files, virtual environments and private database files should not be committed to the repository.
 
-## 🎯 Project Goal
+## Project Goal
 
 Anchor Study aims to make it easier for students to organise their academic lives while maintaining space for faith, prayer and personal growth.
 
 The goal is to create a practical, welcoming study companion that supports consistency and intentional living.
 
-## 🌱 Development Status
+## Development Status
 
 Anchor Study is an ongoing personal development project. New features, improvements and refinements are being introduced as development progresses.
 
-## 👩🏽‍💻 Developer
+## Developer
 
 Created by **Chichi**, as a project exploring web development, Python and student-focused technology.
 
